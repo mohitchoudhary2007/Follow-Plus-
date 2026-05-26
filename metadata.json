@@ -1,0 +1,6 @@
+{
+  "name": "Follow Plus",
+  "description": "A high-tech Instagram growth platform and dashboard with glowing neon accents, featuring free 8-day booster trials (100 daily followers), organic likes, dynamic view simulators, and smart engagement optimization advice.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
