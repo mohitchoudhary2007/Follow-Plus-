@@ -310,9 +310,9 @@ export default function App() {
             <div>
               <h3 className="text-xs font-mono uppercase text-indigo-400 font-bold tracking-widest flex items-center gap-2">
                 <Sparkles className="w-3.5 h-3.5 text-pink-400 animate-pulse" />
-                Global Proxy Pipeline
+                Live Order
               </h3>
-              <p className="text-[10px] text-gray-500 mt-0.5">Real-time delivery status updates from active server meshes.</p>
+              <p className="text-[10px] text-gray-500 mt-0.5">Real-time status of active orders and delivery queues.</p>
             </div>
 
             <div className="space-y-2 font-mono text-[11px] bg-black/40 border border-white/5 p-3.5 rounded-xl">
@@ -327,7 +327,6 @@ export default function App() {
                     className="flex justify-between items-center py-2 first:pt-0 last:pb-0 border-b border-white/5 last:border-b-0"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-600">[{act.server}]</span>
                       <span className="text-gray-200 font-bold">@{act.user}</span>
                     </div>
 

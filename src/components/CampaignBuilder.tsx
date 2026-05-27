@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { User, Copy, Sliders, Check, CircleAlert, Shield, Heart, Eye, Users, Gift, HelpCircle } from 'lucide-react';
+import { User, Copy, Sliders, Check, CircleAlert, Shield, Heart, Eye, Users, Gift, HelpCircle, Sparkles, Clock } from 'lucide-react';
 import { Campaign, CampaignType } from '../types';
 import { addClientCampaignDirectly } from '../firebase';
 
@@ -23,6 +23,12 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
     posts: number;
     nicheHealth: string;
   } | null>(null);
+
+  // Deployed campaign notification overlay states
+  const [showDeliveryBanner, setShowDeliveryBanner] = useState(false);
+  const [deployedAmount, setDeployedAmount] = useState(800);
+  const [deployedUser, setDeployedUser] = useState('');
+  const [deployedType, setDeployedType] = useState<'followers' | 'likes' | 'views'>('followers');
 
   // Premium services state
   const [premiumType, setPremiumType] = useState<CampaignType>('followers');
@@ -156,11 +162,15 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
       }
 
       setSuccessMsg("🎉 Free 8-Days Follower Campaign has been successfully registered!");
+      setDeployedAmount(800);
+      setDeployedUser(verifiedProfile.username);
+      setDeployedType('followers');
+      setShowDeliveryBanner(true);
+      
       onCampaignCreated(data);
       setTimeout(() => {
         setSuccessMsg('');
-        resetForm();
-      }, 4000);
+      }, 6000);
     } catch (err) {
       setErrorMessage("Networking failure. Please retry shortly.");
     }
@@ -247,11 +257,15 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
       }
 
       setSuccessMsg(`🚀 Premium ${premiumType} booster activated! Campaign submitted successfully.`);
+      setDeployedAmount(quantity);
+      setDeployedUser(verifiedProfile.username);
+      setDeployedType(premiumType);
+      setShowDeliveryBanner(true);
+
       onCampaignCreated(data);
       setTimeout(() => {
         setSuccessMsg('');
-        resetForm();
-      }, 4000);
+      }, 6000);
     } catch (err) {
       setErrorMessage("Networking failure.");
     }
@@ -612,6 +626,89 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
           </AnimatePresence>
         </motion.div>
       )}
+
+      {/* Living Delivery Confirmation Overlay (Glow Custom Banner) */}
+      <AnimatePresence>
+        {showDeliveryBanner && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 30, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 30, opacity: 0 }}
+              transition={{ type: 'spring', duration: 0.55, bounce: 0.28 }}
+              className="relative max-w-md w-full bg-gradient-to-br from-cyber-card to-[#040408] border border-neon-pink/30 rounded-3xl p-6 md:p-8 shadow-[0_0_50px_rgba(236,72,153,0.3)] overflow-hidden"
+            >
+              {/* Decorative Ambient Radial Highlights */}
+              <div className="absolute -top-12 -right-12 w-40 h-40 bg-neon-pink/15 rounded-full blur-[70px]" />
+              <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-neon-cyan/15 rounded-full blur-[70px]" />
+
+              {/* Laser Line Running Highlight */}
+              <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-pink-500 to-transparent animate-pulse" />
+
+              <div className="space-y-6 text-center">
+                {/* Simulated live progress circle / icon pulse */}
+                <div className="relative mx-auto w-20 h-20 flex items-center justify-center bg-neon-pink/10 rounded-full border border-neon-pink/30 neon-glow-pink">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 10, ease: 'linear' }}
+                    className="absolute inset-[-4px] border border-dashed border-neon-pink/40 rounded-full"
+                  />
+                  <Users className="w-8 h-8 text-neon-pink animate-pulse" />
+                </div>
+
+                <div className="space-y-2">
+                  <motion.div
+                    initial={{ scale: 0.9 }}
+                    animate={{ scale: 1 }}
+                    transition={{ yoyo: Infinity, duration: 1.5 }}
+                    className="inline-block px-3 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/30 text-[10px] uppercase font-mono tracking-widest text-emerald-400 font-bold"
+                  >
+                    ✔ Live Campaign Started
+                  </motion.div>
+                  <h3 className="text-xl md:text-2xl font-display font-black text-white tracking-tight uppercase">
+                    Order Active!
+                  </h3>
+                  <p className="text-xs font-mono text-gray-400">
+                    Target Profile: <span className="text-neon-cyan font-bold">@{deployedUser}</span>
+                  </p>
+                </div>
+
+                {/* Main high impact Hindi / Hinglish message container requested by the user */}
+                <div className="p-6 rounded-2xl bg-black/80 border border-white/10 shadow-inner relative overflow-hidden group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-pink to-neon-purple opacity-10 rounded-2xl blur group-hover:opacity-15 transition" />
+                  
+                  <div className="relative space-y-3">
+                    <p className="font-display font-bold text-base md:text-lg leading-snug bg-clip-text text-transparent bg-gradient-to-r from-white via-pink-100 to-cyan-200 text-center">
+                      ⚡ Kuch hi ghanto me followers deliver ho jayenge!
+                    </p>
+                    <div className="h-[1px] w-12 bg-white/10 mx-auto" />
+                    <p className="text-center text-xs text-gray-300 leading-relaxed font-sans mt-2">
+                      Aapke account <span className="text-neon-cyan font-bold">@{deployedUser}</span> par safely <span className="text-neon-pink font-bold">+{deployedAmount} {deployedType}</span> bheje ja rahe hain. Delivery organic and gradual hogi taaki koi issue na aaye. Please keep patient!
+                    </p>
+                  </div>
+                </div>
+
+                {/* Action button */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowDeliveryBanner(false);
+                    resetForm();
+                  }}
+                  className="w-full relative overflow-hidden py-3.5 rounded-xl font-display font-bold text-xs uppercase tracking-wider text-white bg-gradient-to-r from-neon-pink via-[#b5179e] to-neon-purple shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_25px_rgba(236,72,153,0.5)] transition-all cursor-pointer pointer-events-auto active:scale-95"
+                >
+                  Thik hai / Done 👍
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
