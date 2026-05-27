@@ -230,6 +230,19 @@ export default function App() {
           </div>
         </header>
 
+        {/* Clean and Clear Trust Badge in simple Indian English Style */}
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-wrap items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-500/15 via-black/40 to-indigo-500/15 rounded-2xl border border-emerald-500/25 max-w-2xl mx-auto text-xs font-semibold text-center text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.15)] backdrop-blur-md"
+        >
+          <span className="flex h-2.5 w-2.5 relative">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <span>Aapka account completely safe rehne wala hai! Yeh process bilkul <strong className="text-white bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-teal-200 font-extrabold pb-0.5">Clean and Clear</strong> hai ✨💎🛡️🚀⭐</span>
+        </motion.div>
+
         {/* Frosted Glass Majestic Hero Showcase banner */}
         {showFirstUserGreeting && (
           <motion.div 

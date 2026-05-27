@@ -73,10 +73,10 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
 
   // Pricing formula
   const getPremiumPrice = () => {
-    if (premiumType === 'followers') return (quantity * 0.0069).toFixed(2);
-    if (premiumType === 'likes') return (quantity * 0.0039).toFixed(2);
-    if (premiumType === 'views') return (quantity * 0.00099).toFixed(2);
-    return "0.00";
+    if (premiumType === 'followers') return Math.round(quantity * 0.55);
+    if (premiumType === 'likes') return Math.round(quantity * 0.30);
+    if (premiumType === 'views') return Math.round(quantity * 0.08);
+    return 0;
   };
 
   // Clear states
@@ -469,7 +469,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
                 <div className="p-4 rounded-xl bg-black/40 border border-white/5">
                   <span className="text-xs text-gray-500 block">Total Benefit</span>
                   <span className="text-lg font-display font-semibold text-neon-pink mt-1 block">800 Followers</span>
-                  <span className="text-[10px] text-gray-400 mt-1 block">Value $12.90 USD • 100% Free</span>
+                  <span className="text-[10px] text-gray-400 mt-1 block">Value ₹1,099 INR • 100% Free</span>
                 </div>
               </div>
 
@@ -583,7 +583,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
                 </div>
                 <div className="text-right">
                   <span className="text-xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-purple">
-                    ${getPremiumPrice()} USD
+                    ₹{getPremiumPrice()} INR
                   </span>
                   <span className="text-[10px] text-emerald-400 block font-semibold uppercase">INSTANT DELIVERY OK</span>
                 </div>
