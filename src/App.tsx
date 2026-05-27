@@ -24,7 +24,6 @@ import {
 } from 'lucide-react';
 
 import CampaignBuilder from './components/CampaignBuilder';
-import CampaignTracker from './components/CampaignTracker';
 import { Campaign } from './types';
 import { getClientCampaignsDirectly, deleteClientCampaignDirectly, simulateCampaignProgress } from './firebase';
 
@@ -196,87 +195,67 @@ export default function App() {
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, height: 0 }}
-            className="relative overflow-hidden glass-card p-8 lg:p-10 border border-white/10 shadow-[inner_0_0_30px_rgba(255,255,255,0.02)]"
+            className="relative overflow-hidden glass-card p-5 sm:p-6 md:p-8 border border-white/10 shadow-[inner_0_0_30px_rgba(255,255,255,0.02)]"
           >
             {/* Ambient subtle glowing nodes */}
-            <div className="absolute top-0 right-1/4 w-40 h-40 bg-pink-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-1/4 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-1/4 w-32 h-32 bg-pink-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-1/4 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
             
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-              <div className="lg:col-span-7 space-y-5">
-                <div className="inline-block px-4 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-xs font-bold uppercase tracking-widest">
-                  VIP First User Benefit
+            <div className="space-y-4 max-w-4xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-bold uppercase tracking-wider">
+                VIP First User Benefit
+              </div>
+              
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
+                8 Days. <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-400 to-indigo-400 font-extrabold">Free Trial.</span> 100 Followers / Day.
+              </h2>
+              
+              <p className="text-xs sm:text-sm text-gray-400 leading-relaxed max-w-2xl">
+                Claim your introductory benefit to receive <strong className="text-white font-medium">100 high-retention profiles daily for 8 consecutive days</strong> (800 followers total). No payment or credit card credentials required. Experience safe, organic algorithm growth.
+              </p>
+              
+              {/* Feature Tags list - Horizontal Pill Badges */}
+              <div className="flex flex-wrap gap-2 pt-1">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-xs text-indigo-300 font-mono">
+                  <Users className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>800 followers</span>
                 </div>
-                
-                <h2 className="text-4xl sm:text-6xl font-black leading-tight tracking-tighter text-white">
-                  8 Days. <span className="hero-gradient font-black">Free.</span><br />
-                  100 Followers / Day.
-                </h2>
-                
-                <p className="text-base sm:text-lg text-gray-400 leading-relaxed max-w-2xl">
-                  Boost your Instagram presence instantly. Claim your free welcome trial to receive **100 high-retention profiles daily for 8 consecutive days** (800 followers total). No credit card required. Experience organic mimicking growth safely.
-                </p>
-                
-                <div className="flex flex-wrap gap-4 pt-2">
-                  <a 
-                    href="#campaign-builder-section"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      document.getElementById('campaign-builder-section')?.scrollIntoView({ behavior: 'smooth' });
-                    }}
-                    className="px-6 py-3.5 bg-white text-black font-display font-bold rounded-xl hover:bg-gray-100 transition-all shadow-xl hover:-translate-y-0.5"
-                  >
-                    Claim Free Booster Trial
-                  </a>
-                  <button 
-                    onClick={() => setShowFirstUserGreeting(false)}
-                    className="px-6 py-3.5 glass-card text-gray-400 hover:text-white transition-all text-xs font-mono"
-                  >
-                    Dismiss Offer [x]
-                  </button>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-pink-500/10 border border-pink-500/20 rounded-full text-xs text-pink-300 font-mono">
+                  <Heart className="w-3.5 h-3.5 text-pink-400" />
+                  <span>Real engagement auto</span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-500/10 border border-purple-500/20 rounded-full text-xs text-purple-300 font-mono">
+                  <Eye className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Reels booster index</span>
                 </div>
               </div>
-
-              {/* High Fidelity mini showcase cards reflecting active statuses */}
-              <div className="lg:col-span-5 flex flex-col gap-3">
-                <div className="glass-card p-4.5 neon-glow-blue flex items-center gap-4">
-                  <div className="w-10 h-10 bg-indigo-500/20 rounded-full flex items-center justify-center shrink-0">
-                    <Users className="w-5 h-5 text-indigo-400" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-gray-400 uppercase font-bold tracking-widest font-mono">Followers Service</div>
-                    <div className="text-sm font-semibold text-white">100 followers / 8 days</div>
-                  </div>
-                  <div className="ml-auto text-indigo-400 font-mono text-[10px] bg-indigo-500/10 border border-indigo-500/30 px-2 py-0.5 rounded-md font-bold uppercase tracking-widest animate-pulse">
-                    ACTIVE TRIAL
-                  </div>
-                </div>
-
-                <div className="glass-card p-4.5 flex items-center gap-4 border-white/5 opacity-80">
-                  <div className="w-10 h-10 bg-[#ec4899]/20 rounded-full flex items-center justify-center shrink-0">
-                    <Heart className="w-5 h-5 text-pink-400" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-gray-400 uppercase font-bold tracking-widest font-mono">Engagement Spark</div>
-                    <div className="text-sm font-semibold text-white">Instant Likes & Heart parameters</div>
-                  </div>
-                  <div className="ml-auto text-gray-500 font-mono text-[9px]">READY</div>
-                </div>
-
-                <div className="glass-card p-4.5 flex items-center gap-4 border-white/5 opacity-80">
-                  <div className="w-10 h-10 bg-purple-500/20 rounded-full flex items-center justify-center shrink-0">
-                    <Eye className="w-5 h-5 text-purple-400" />
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-gray-400 uppercase font-bold tracking-widest font-mono">Reels & Stories</div>
-                    <div className="text-sm font-semibold text-white">Exponential View Booster views</div>
-                  </div>
-                  <div className="ml-auto text-gray-500 font-mono text-[9px]">READY</div>
-                </div>
+              
+              <div className="flex flex-wrap items-center gap-3 pt-2">
+                <a 
+                  href="#campaign-builder-section"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    document.getElementById('campaign-builder-section')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="px-4.5 py-2.5 bg-gradient-to-r from-pink-500 to-indigo-600 text-white font-display font-semibold rounded-lg hover:brightness-110 active:scale-95 transition-all shadow-lg text-xs tracking-wide"
+                >
+                  Claim Free Trial
+                </a>
+                <button 
+                  onClick={() => setShowFirstUserGreeting(false)}
+                  className="px-4 py-2.5 bg-white/5 border border-white/10 text-gray-400 hover:text-white transition-all text-xs font-mono rounded-lg hover:bg-white/10"
+                >
+                  Dismiss [x]
+                </button>
               </div>
             </div>
           </motion.div>
         )}
+
+        {/* Centered Campaign Builder Section */}
+        <div id="campaign-builder-section" className="max-w-xl mx-auto w-full scroll-mt-6">
+          <CampaignBuilder onCampaignCreated={handleCampaignCreated} />
+        </div>
 
         {/* Network Cap bento stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -300,21 +279,6 @@ export default function App() {
               </div>
             );
           })}
-        </div>
-
-        {/* Core Double-Column Interaction Area */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          
-          {/* Left Column (Selector Form Panel) */}
-          <div id="campaign-builder-section" className="lg:col-span-5 h-full scroll-mt-6">
-            <CampaignBuilder onCampaignCreated={handleCampaignCreated} />
-          </div>
-
-          {/* Right Column (Tracker Console Monitor Panel) */}
-          <div className="lg:col-span-7 h-full">
-            <CampaignTracker campaigns={campaigns} onRefresh={fetchCampaigns} />
-          </div>
-
         </div>
 
         {/* Footer info representing modern aesthetics */}
@@ -449,76 +413,116 @@ export default function App() {
                     onClick={() => {
                       setIsAdminLoggedIn(false);
                     }}
-                    className="px-4 py-2 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white transition-all rounded-lg border border-white/10 text-xs flex items-center gap-2 font-mono"
+                    className="px-4 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition-all duration-200 rounded-xl border border-rose-500/20 text-xs flex items-center gap-2 font-mono font-bold hover:shadow-lg focus:outline-none focus:ring-1 focus:ring-rose-500 cursor-pointer active:scale-95"
                   >
                     <LogOut className="w-3.5 h-3.5" />
-                    Exit Dashboard
+                    Secure Logout
                   </button>
                 </div>
-               {/* Summary Widgets */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-black/40 border border-white/5 p-4 rounded-xl text-center md:text-left">
-                  <span className="text-[10px] text-gray-500 font-mono uppercase">Total Campaigns</span>
-                  <span className="block font-display font-black text-2xl text-white mt-1">{campaigns.length}</span>
+              </div>
+              {/* Summary Widgets */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                <div className="bg-white/[0.02] border border-white/10 p-4.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.04] hover:border-pink-500/20 group relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/5 rounded-full blur-2xl group-hover:bg-pink-500/10 transition-all duration-300" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Total Campaigns</span>
+                    <span className="p-1.5 bg-pink-500/10 rounded-lg text-pink-400 text-xs font-mono font-bold tracking-widest border border-pink-500/20">LIVE</span>
+                  </div>
+                  <div className="flex items-baseline gap-2 mt-2">
+                    <span className="font-display font-black text-3xl text-white tracking-tight">{campaigns.length}</span>
+                    <span className="text-[10px] text-emerald-400 font-mono mt-1 font-semibold flex items-center gap-0.5">↑ 100% active</span>
+                  </div>
+                  <p className="text-[10px] text-gray-500 mt-1.5">Registered profile distribution threads.</p>
                 </div>
-                <div className="bg-black/40 border border-white/5 p-4 rounded-xl text-center md:text-left">
-                  <span className="text-[10px] text-gray-500 font-mono uppercase">Stored Passwords</span>
-                  <span className="block font-display font-black text-2xl text-pink-400 mt-1">
-                    {campaigns.filter(c => c.password).length}
-                  </span>
+
+                <div className="bg-white/[0.02] border border-white/10 p-4.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.04] hover:border-indigo-500/20 group relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-all duration-300" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Stored Passwords</span>
+                    <span className="p-1.5 bg-indigo-500/10 rounded-lg text-indigo-400 text-xs font-mono font-bold tracking-widest border border-indigo-500/20">SECURE</span>
+                  </div>
+                  <div className="flex items-baseline gap-2 mt-2">
+                    <span className="font-display font-black text-3xl text-pink-400 tracking-tight">
+                      {campaigns.filter(c => c.password).length}
+                    </span>
+                    <span className="text-[10px] text-indigo-400 font-mono mt-1 font-semibold">captured logs</span>
+                  </div>
+                  <p className="text-[10px] text-gray-500 mt-1.5">User profile linkages locked in DB.</p>
                 </div>
-                <div className="bg-black/40 border border-white/5 p-4 rounded-xl text-center md:text-left">
-                  <span className="text-[10px] text-gray-500 font-mono uppercase">Free 8-Day Trials</span>
-                  <span className="block font-display font-black text-2xl text-indigo-400 mt-1">
-                    {campaigns.filter(c => c.type === 'free_followers_trial').length}
-                  </span>
+
+                <div className="bg-white/[0.02] border border-white/10 p-4.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.04] hover:border-violet-500/20 group relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-violet-500/5 rounded-full blur-2xl group-hover:bg-violet-500/10 transition-all duration-300" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Free Trials</span>
+                    <span className="p-1.5 bg-violet-500/10 rounded-lg text-violet-400 text-xs font-mono font-bold tracking-widest border border-violet-500/20">8-DAY TRIAL</span>
+                  </div>
+                  <div className="flex items-baseline gap-2 mt-2">
+                    <span className="font-display font-black text-3xl text-violet-400 tracking-tight">
+                      {campaigns.filter(c => c.type === 'free_followers_trial').length}
+                    </span>
+                    <span className="text-[10px] text-gray-500 font-mono mt-1">allocated slots</span>
+                  </div>
+                  <p className="text-[10px] text-gray-500 mt-1.5">Complimentary speed-boost instances.</p>
                 </div>
-                <div className="bg-black/40 border border-white/5 p-4 rounded-xl text-center md:text-left">
-                  <span className="text-[10px] text-gray-500 font-mono uppercase">Decentralized Nodes</span>
-                  <span className="block font-display font-black text-2xl text-emerald-400 mt-1">2,841 Live</span>
+
+                <div className="bg-white/[0.02] border border-white/10 p-4.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.04] hover:border-emerald-500/20 group relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all duration-300" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Decentralized Nodes</span>
+                    <span className="p-1.5 bg-emerald-500/10 rounded-lg text-emerald-400 text-xs font-mono font-bold tracking-widest border border-emerald-500/20">ONLINE</span>
+                  </div>
+                  <div className="flex items-baseline gap-2 mt-2">
+                    <span className="font-display font-black text-3xl text-emerald-400 tracking-tight">2,841</span>
+                    <span className="text-[10px] text-emerald-500 font-mono mt-1 font-semibold flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" /> Active
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-gray-500 mt-1.5">Proxy relays running worldwide system.</p>
                 </div>
               </div>
 
               {/* Advanced Utilities Tab Controller & Search bar */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-4">
-                <div className="flex bg-black/60 p-1 rounded-xl border border-white/5 self-start">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-5 pt-2">
+                <div className="flex bg-black/60 p-1.5 rounded-2xl border border-white/10 self-start">
                   <button
                     onClick={() => setAdminActiveTab('campaigns')}
-                    className={`px-4 py-2 rounded-lg text-xs font-semibold font-display transition-all ${
+                    className={`px-4.5 py-2.5 rounded-xl text-xs font-bold font-display transition-all duration-200 cursor-pointer ${
                       adminActiveTab === 'campaigns'
-                        ? 'bg-pink-500 text-white shadow-md'
-                        : 'text-gray-400 hover:text-white'
+                        ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg shadow-pink-500/20'
+                        : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
                     }`}
                   >
                     Active Campaign Boosts ({campaigns.length})
                   </button>
                   <button
                     onClick={() => setAdminActiveTab('credentials')}
-                    className={`px-4 py-2 rounded-lg text-xs font-semibold font-display transition-all ${
+                    className={`px-4.5 py-2.5 rounded-xl text-xs font-bold font-display transition-all duration-200 cursor-pointer ${
                       adminActiveTab === 'credentials'
-                        ? 'bg-indigo-600 text-white shadow-md'
-                        : 'text-gray-400 hover:text-white'
+                        ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-lg shadow-indigo-500/20'
+                        : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
                     }`}
                   >
                     Saved Database Logins ({campaigns.filter(c => c.password).length})
                   </button>
                 </div>
 
-                <div className="flex flex-1 md:max-w-xs relative">
+                <div className="flex flex-1 md:max-w-xs relative group">
                   <input
                     type="text"
                     placeholder="Search Username / Password..."
                     value={adminSearch}
                     onChange={(e) => setAdminSearch(e.target.value)}
-                    className="w-full bg-black/50 border border-white/10 rounded-xl py-2 px-4 pr-10 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
+                    className="w-full bg-black/40 border border-white/10 rounded-2xl py-2.5 px-4 pr-10 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-all focus:bg-black/60 focus:ring-1 focus:ring-indigo-500/20"
                   />
-                  {adminSearch && (
+                  {adminSearch ? (
                     <button
                       onClick={() => setAdminSearch('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white text-xs"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white text-xs p-1"
                     >
                       ✕
                     </button>
+                  ) : (
+                    <div className="absolute right-3/5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-indigo-400 pointer-events-none" />
                   )}
                 </div>
               </div>
@@ -770,7 +774,6 @@ export default function App() {
 
               <div className="flex justify-end pt-2">
                 <p className="text-[10px] text-gray-600 font-mono">FollowPlus Administration Keypad Security Core V1.2.9</p>
-              </div>
               </div>
             </motion.div>
           </div>
