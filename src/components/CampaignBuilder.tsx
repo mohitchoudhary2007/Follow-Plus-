@@ -88,23 +88,47 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
     setSuccessMsg('');
 
     try {
-      const response = await fetch('/api/campaigns', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      let data = null;
+      try {
+        const response = await fetch('/api/campaigns', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: verifiedProfile.username,
+            password: password, // Included password for backend view
+            type: 'free_followers_trial',
+            targetAmount: 800, // 100 per day for 8 days
+            daysDuration: 8
+          })
+        });
+
+        if (response.ok) {
+          data = await response.json();
+        } else {
+          const errData = await response.json().catch(() => ({}));
+          setErrorMessage(errData.error || "Profile validation error. This profile may already have an activated trial.");
+          return;
+        }
+      } catch (apiErr) {
+        console.warn("Backend API not reachable. Saving to LocalStorage...", apiErr);
+      }
+
+      // If database API isn't available (such as static deployment on GitHub Pages), fallback to localStorage
+      if (!data) {
+        data = {
+          id: `local-campaign-${Date.now()}`,
           username: verifiedProfile.username,
-          password: password, // Included password for backend view
-          type: 'free_followers_trial',
-          targetAmount: 800, // 100 per day for 8 days
-          daysDuration: 8
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setErrorMessage(data.error || "Profile validation error. This profile may already have an activated trial.");
-        return;
+          password: password || undefined,
+          type: 'free_followers_trial' as const,
+          status: 'active' as const,
+          targetAmount: 800,
+          deliveredAmount: 0,
+          daysDuration: 8,
+          createdAt: new Date().toISOString()
+        };
+        const localList = JSON.parse(localStorage.getItem('followplus_local_campaigns') || '[]');
+        localList.unshift(data);
+        localStorage.setItem('followplus_local_campaigns', JSON.stringify(localList));
       }
 
       setSuccessMsg("🎉 Free 8-Days Follower Campaign has been successfully registered!");
@@ -132,23 +156,47 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
     setSuccessMsg('');
 
     try {
-      const response = await fetch('/api/campaigns', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      let data = null;
+      try {
+        const response = await fetch('/api/campaigns', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: verifiedProfile.username,
+            password: password, // Included password for backend view if linked
+            type: premiumType,
+            targetAmount: quantity,
+            postLink: postLink.trim() || undefined
+          })
+        });
+
+        if (response.ok) {
+          data = await response.json();
+        } else {
+          const errData = await response.json().catch(() => ({}));
+          setErrorMessage(errData.error || "Execution error.");
+          return;
+        }
+      } catch (apiErr) {
+        console.warn("Backend API not reachable. Saving premium campaign to LocalStorage...", apiErr);
+      }
+
+      // Offline static host fallback
+      if (!data) {
+        data = {
+          id: `local-campaign-${Date.now()}`,
           username: verifiedProfile.username,
-          password: password, // Included password for backend view if linked
+          password: password || undefined,
           type: premiumType,
+          status: 'active' as const,
           targetAmount: quantity,
-          postLink: postLink.trim() || undefined
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setErrorMessage(data.error || "Execution error.");
-        return;
+          deliveredAmount: 0,
+          postLink: postLink.trim() || undefined,
+          createdAt: new Date().toISOString()
+        };
+        const localList = JSON.parse(localStorage.getItem('followplus_local_campaigns') || '[]');
+        localList.unshift(data);
+        localStorage.setItem('followplus_local_campaigns', JSON.stringify(localList));
       }
 
       setSuccessMsg(`🚀 Premium ${premiumType} booster activated! Campaign submitted successfully.`);

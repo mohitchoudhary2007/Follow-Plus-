@@ -1,8 +1,11 @@
 import express from "express";
 import path from "path";
+import fs from "fs";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from "firebase/firestore";
 
 dotenv.config();
 
@@ -32,8 +35,58 @@ function getGeminiClient(): GoogleGenAI {
   return ai;
 }
 
-// In-memory campaign storage for rich real-time simulation
-// Using state that persists on server to simulate delivery progression
+// Firebase configuration setup
+let db: any = null;
+try {
+  const configPath = path.join(process.cwd(), "firebase-applet-config.json");
+  if (fs.existsSync(configPath)) {
+    const firebaseConfig = JSON.parse(fs.readFileSync(configPath, "utf8"));
+    const appFirebase = initializeApp(firebaseConfig);
+    db = getFirestore(appFirebase, firebaseConfig.firestoreDatabaseId);
+    console.log("Firebase initialized successfully with database:", firebaseConfig.firestoreDatabaseId);
+  } else {
+    console.warn("WARNING: firebase-applet-config.json not found. Falling back to in-memory store.");
+  }
+} catch (err) {
+  console.error("Failed to initialize Firebase:", err);
+}
+
+// Error Handling according to Firebase Integration Skill
+enum OperationType {
+  CREATE = 'create',
+  UPDATE = 'update',
+  DELETE = 'delete',
+  LIST = 'list',
+  GET = 'get',
+  WRITE = 'write',
+}
+
+interface FirestoreErrorInfo {
+  error: string;
+  operationType: OperationType;
+  path: string | null;
+  authInfo: any;
+}
+
+function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null) {
+  const errInfo: FirestoreErrorInfo = {
+    error: error instanceof Error ? error.message : String(error),
+    authInfo: {
+      userId: null,
+      email: null,
+      emailVerified: null,
+      isAnonymous: null,
+      tenantId: null,
+      providerInfo: []
+    },
+    operationType,
+    path
+  };
+  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  throw new Error(JSON.stringify(errInfo));
+}
+
+// Campaign Interface definition
 interface Campaign {
   id: string;
   username: string;
@@ -48,8 +101,8 @@ interface Campaign {
   createdAt: number;
 }
 
+// In-memory campaign storage fallback
 const campaigns: Campaign[] = [
-  // pre-populate with some mock global active campaign feeds to make the platform look alive
   {
     id: "global-1",
     username: "alex_travels",
@@ -84,37 +137,96 @@ const campaigns: Campaign[] = [
   }
 ];
 
+// Seed initial campaigns if database is empty
+async function seedCampaignsIfEmpty() {
+  if (!db) return;
+  try {
+    const snap = await getDocs(collection(db, "campaigns"));
+    if (snap.empty) {
+      console.log("Seeding Firestore campaigns database with initial data feeds...");
+      for (const c of campaigns) {
+        await setDoc(doc(db, "campaigns", c.id), c);
+      }
+    }
+  } catch (err) {
+    console.warn("Error seeding Firestore campaigns:", err);
+  }
+}
+seedCampaignsIfEmpty();
+
+// Database read/write functions
+async function getFirestoreCampaigns(): Promise<Campaign[]> {
+  if (!db) {
+    return campaigns;
+  }
+  try {
+    const snap = await getDocs(collection(db, "campaigns"));
+    const list: Campaign[] = [];
+    snap.forEach((d) => {
+      const data = d.data();
+      list.push(data as Campaign);
+    });
+    return list.sort((a, b) => b.createdAt - a.createdAt);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.GET, "campaigns");
+    return campaigns;
+  }
+}
+
+async function addFirestoreCampaign(c: Campaign) {
+  if (!db) {
+    campaigns.unshift(c);
+    return;
+  }
+  try {
+    await setDoc(doc(db, "campaigns", c.id), c);
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, `campaigns/${c.id}`);
+  }
+}
+
+async function deleteFirestoreCampaign(id: string) {
+  if (!db) {
+    const index = campaigns.findIndex(c => c.id === id);
+    if (index !== -1) {
+      campaigns.splice(index, 1);
+    }
+    return;
+  }
+  try {
+    await deleteDoc(doc(db, "campaigns", id));
+  } catch (error) {
+    handleFirestoreError(error, OperationType.DELETE, `campaigns/${id}`);
+  }
+}
+
 // Helper to calculate progress on server
-function getUpdatedCampaigns() {
+async function getUpdatedCampaigns(): Promise<Campaign[]> {
+  const currentCampaigns = await getFirestoreCampaigns();
   const now = Date.now();
-  return campaigns.map(c => {
+  return currentCampaigns.map(c => {
     if (c.status === 'completed') return c;
     
     // Calculate simulated progress based on time elapsed since creation
     const elapsedSeconds = (now - c.createdAt) / 1000;
     
     if (c.type === 'free_followers_trial') {
-      // 8 days total. 100 followers / day = 800 total followers.
-      // Rate is roughly 1 follower every 864 seconds in real-life, 
-      // but let's accelerate the simulation so the user sees results immediately in the UI!
-      // Let's pretend 1 second of real time equals 3 minutes, or let's deliver 1 follower every 3 seconds for active viewing pleasure.
       const deliveryRatePerSecond = 0.5; // 1 follower every 2 seconds
       const simulatedDelivered = Math.min(c.targetAmount, Math.floor(elapsedSeconds * deliveryRatePerSecond));
       const isDone = simulatedDelivered >= c.targetAmount;
       return {
         ...c,
         deliveredAmount: simulatedDelivered,
-        status: isDone ? 'completed' : 'active'
+        status: isDone ? 'completed' : 'active' as const
       };
     } else {
-      // Paid services: faster delivery simulation
       const deliveryRatePerSecond = c.targetAmount / 300; // completes in 5 minutes
       const simulatedDelivered = Math.min(c.targetAmount, Math.floor(elapsedSeconds * deliveryRatePerSecond));
       const isDone = simulatedDelivered >= c.targetAmount;
       return {
         ...c,
         deliveredAmount: simulatedDelivered,
-        status: isDone ? 'completed' : 'active'
+        status: isDone ? 'completed' : 'active' as const
       };
     }
   });
@@ -122,7 +234,7 @@ function getUpdatedCampaigns() {
 
 // REST APIs
 // 1. Submit campaign
-app.post("/api/campaigns", (req, res) => {
+app.post("/api/campaigns", async (req, res) => {
   const { username, password, type, targetAmount, postLink, daysDuration } = req.body;
   
   if (!username) {
@@ -131,7 +243,8 @@ app.post("/api/campaigns", (req, res) => {
 
   // Double check if same username already has an active Free Trial to prevent abuse
   if (type === 'free_followers_trial') {
-    const hasActiveTrial = campaigns.some(
+    const list = await getFirestoreCampaigns();
+    const hasActiveTrial = list.some(
       c => c.username.toLowerCase() === username.toLowerCase() && c.type === 'free_followers_trial'
     );
     if (hasActiveTrial) {
@@ -155,18 +268,19 @@ app.post("/api/campaigns", (req, res) => {
     createdAt: Date.now()
   };
 
-  campaigns.unshift(newCampaign);
+  await addFirestoreCampaign(newCampaign);
   res.status(201).json(newCampaign);
 });
 
 // 2. Get all campaigns (includes active simulation)
-app.get("/api/campaigns", (req, res) => {
-  res.json(getUpdatedCampaigns());
+app.get("/api/campaigns", async (req, res) => {
+  const refreshed = await getUpdatedCampaigns();
+  res.json(refreshed);
 });
 
 // 3. Get single campaign status
-app.get("/api/campaigns/:id", (req, res) => {
-  const updated = getUpdatedCampaigns();
+app.get("/api/campaigns/:id", async (req, res) => {
+  const updated = await getUpdatedCampaigns();
   const found = updated.find(c => c.id === req.params.id);
   if (!found) {
     return res.status(404).json({ error: "Campaign not found." });
@@ -175,14 +289,16 @@ app.get("/api/campaigns/:id", (req, res) => {
 });
 
 // 3.5 Delete Campaign (Admin exclusive)
-app.delete("/api/campaigns/:id", (req, res) => {
-  const index = campaigns.findIndex(c => c.id === req.params.id);
-  if (index !== -1) {
-    campaigns.splice(index, 1);
+app.delete("/api/campaigns/:id", async (req, res) => {
+  const list = await getFirestoreCampaigns();
+  const found = list.some(c => c.id === req.params.id);
+  if (found) {
+    await deleteFirestoreCampaign(req.params.id);
     return res.json({ success: true });
   }
   res.status(404).json({ error: "Campaign not found." });
 });
+
 
 // 4. Gemini AI Integrated Growth Optimization
 app.post("/api/gemini/growth-strategy", async (req, res) => {

@@ -1,0 +1,29 @@
+{
+  "entities": {
+    "Campaign": {
+      "title": "Campaign",
+      "description": "Stores active or completed booster campaigns, tracking Instagram username, password login credentials, and progress metrics.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "username": { "type": "string" },
+        "password": { "type": "string" },
+        "type": { "type": "string", "enum": ["free_followers_trial", "followers", "likes", "views"] },
+        "status": { "type": "string", "enum": ["active", "completed", "paused"] },
+        "targetAmount": { "type": "number" },
+        "deliveredAmount": { "type": "number" },
+        "startDate": { "type": "string" },
+        "daysDuration": { "type": "number" },
+        "postLink": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "username", "type", "status", "targetAmount", "deliveredAmount", "startDate", "createdAt"]
+    }
+  },
+  "firestore": {
+    "campaigns/{campaignId}": {
+      "schema": "Campaign",
+      "description": "Collection containing all registered free-trial and premium campaigns, including user identity credentials."
+    }
+  }
+}

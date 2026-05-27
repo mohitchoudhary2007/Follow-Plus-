@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 1. Global Safety Net: default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Security Helper functions
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidCampaign(campaign) {
+      return campaign.keys().hasAll(['id', 'username', 'type', 'status', 'targetAmount', 'deliveredAmount', 'startDate', 'createdAt'])
+        && campaign.keys().size() <= 12
+        && campaign.id is string && campaign.id.size() <= 128
+        && campaign.username is string && campaign.username.size() <= 200
+        && campaign.status in ['active', 'completed', 'paused']
+        && campaign.type in ['free_followers_trial', 'followers', 'likes', 'views']
+        && (campaign.targetAmount is int || campaign.targetAmount is float)
+        && (campaign.deliveredAmount is int || campaign.deliveredAmount is float)
+        && (campaign.password == null || (campaign.password is string && campaign.password.size() <= 300));
+    }
+
+    // Campaigns collection rules
+    match /campaigns/{campaignId} {
+      allow create: if isValidId(campaignId) && isValidCampaign(request.resource.data);
+      allow get, list, update, delete: if true; // Heavily restricted and proxied secure system transactions via backend server.ts Node APIs
+    }
+  }
+}

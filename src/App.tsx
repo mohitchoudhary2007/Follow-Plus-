@@ -67,17 +67,30 @@ export default function App() {
     }
   }, [logoClicks]);
 
-  // Fetch campaigns from backend
+  // Fetch campaigns from backend with localStorage fallback for static deployment (GitHub Pages)
   const fetchCampaigns = async () => {
+    let serverCampaigns: Campaign[] = [];
     try {
       const res = await fetch('/api/campaigns');
       if (res.ok) {
-        const data = await res.json();
-        setCampaigns(data);
+        serverCampaigns = await res.json();
       }
     } catch (err) {
-      console.warn("Failed to fetch campaigns from local backend. Using offline-simulated layout.");
+      console.warn("Backend API not reachable. Using offline localStorage simulation...", err);
     }
+
+    // Load from localStorage as well
+    const localList = JSON.parse(localStorage.getItem('followplus_local_campaigns') || '[]');
+    
+    // Merge server lists and local lists, avoiding duplicate IDs
+    const mergedList = [...serverCampaigns];
+    localList.forEach((localItem: Campaign) => {
+      if (!mergedList.some((item) => item.id === localItem.id)) {
+        mergedList.push(localItem);
+      }
+    });
+
+    setCampaigns(mergedList);
   };
 
   useEffect(() => {
@@ -86,18 +99,31 @@ export default function App() {
 
   const handleCampaignCreated = (newCampaign: Campaign) => {
     // Refresh campaign dashboard list state on submit immediately
-    setCampaigns((prev) => [newCampaign, ...prev]);
+    setCampaigns((prev) => {
+      if (prev.some(c => c.id === newCampaign.id)) return prev;
+      return [newCampaign, ...prev];
+    });
   };
 
   const deleteCampaign = async (id: string) => {
+    // 1. Try deleting on backend server
     try {
-      const res = await fetch(`/api/campaigns/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        fetchCampaigns();
-      }
+      await fetch(`/api/campaigns/${id}`, { method: 'DELETE' });
     } catch (err) {
-      console.warn("Error deleting campaign inside workspace server:", err);
+      console.warn("Backend unavailable to delete, removing client-side only.", err);
     }
+
+    // 2. Always delete from client localStorage
+    try {
+      const localList = JSON.parse(localStorage.getItem('followplus_local_campaigns') || '[]');
+      const filtered = localList.filter((item: any) => item.id !== id);
+      localStorage.setItem('followplus_local_campaigns', JSON.stringify(filtered));
+    } catch (err) {
+      console.error("Failed to delete from localStorage", err);
+    }
+
+    // 3. Update component state and sync list
+    setCampaigns((prev) => prev.filter((item) => item.id !== id));
   };
 
   return (
