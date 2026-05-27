@@ -30,6 +30,41 @@ import { getClientCampaignsDirectly, deleteClientCampaignDirectly, simulateCampa
 export default function App() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [showFirstUserGreeting, setShowFirstUserGreeting] = useState(true);
+  
+  // Real-time live activity feed state representing simulated proxy events
+  const [liveActivities, setLiveActivities] = useState([
+    { id: 1, user: 'ananya_curates', type: 'likes', amount: 250, server: 'US-EAST-4' },
+    { id: 2, user: 'nikhil_clicks', type: 'followers', amount: 100, server: 'EU-WEST-1' },
+    { id: 3, user: 'priya_vocalist', type: 'views', amount: 2500, server: 'APAC-SOUTH-2' },
+    { id: 4, user: 'rohan_travels', type: 'followers', amount: 100, server: 'LATAM-EAST' },
+  ]);
+
+  useEffect(() => {
+    const usersPool = ['sam_aesthetic', 'neha_style', 'kabir_vibe', 'tanya_lens', 'aarav_fitness', 'deepa_foodie', 'isha_reels', 'manish_tech', 'karan_vlog', 'reema_art', 'zoya_minimal', 'arjun_raw'];
+    const typesPool = ['followers', 'likes', 'views'];
+    const serversPool = ['US-WEST-2', 'EU-CENTRAL-1', 'APAC-SOUTH-1', 'LATAM-WEST-4', 'ME-EAST-3', 'APAC-NORTH-2'];
+    
+    const interval = setInterval(() => {
+      const randomUser = usersPool[Math.floor(Math.random() * usersPool.length)];
+      const randomType = typesPool[Math.floor(Math.random() * typesPool.length)];
+      const randomServer = serversPool[Math.floor(Math.random() * serversPool.length)];
+      let randomAmount = 100;
+      if (randomType === 'likes') randomAmount = [150, 300, 500, 750][Math.floor(Math.random() * 4)];
+      if (randomType === 'views') randomAmount = [800, 1500, 3000, 6000][Math.floor(Math.random() * 4)];
+      
+      const newEvent = {
+        id: Date.now(),
+        user: randomUser,
+        type: randomType,
+        amount: randomAmount,
+        server: randomServer
+      };
+      
+      setLiveActivities(prev => [newEvent, ...prev.slice(0, 3)]);
+    }, 2800);
+    
+    return () => clearInterval(interval);
+  }, []);
 
   // Admin and Click states
   const [logoClicks, setLogoClicks] = useState(0);
@@ -146,10 +181,16 @@ export default function App() {
         backgroundColor: '#05050a'
       }}
     >
-      {/* Lighting Spheres from Frosted Glass Template */}
-      <div className="lighting-sphere" style={{ top: '-100px', left: '-100px' }} />
-      <div className="lighting-sphere" style={{ bottom: '10%', right: '-150px', background: 'radial-gradient(circle, #ec489922 0%, transparent 70%)' }} />
-      <div className="lighting-sphere" style={{ top: '40%', right: '15%', background: 'radial-gradient(circle, #a855f715 0%, transparent 70%)', width: '500px', height: '500px' }} />
+      {/* Dynamic Cybersecurity Digital Grid Overlay */}
+      <div className="absolute inset-0 cyber-grid opacity-75 z-0" />
+
+      {/* Floating Living Ambiance Nebula Spheres (Live Animating Backdrop) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-15%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-tr from-indigo-500/10 via-purple-500/10 to-transparent blur-[110px] animate-float-1" />
+        <div className="absolute bottom-[15%] right-[-15%] w-[45vw] h-[45vw] rounded-full bg-gradient-to-br from-pink-500/12 via-rose-500/5 to-transparent blur-[120px] animate-float-2" />
+        <div className="absolute top-[30%] right-[10%] w-[40vw] h-[40vw] rounded-full bg-gradient-to-tl from-cyan-500/8 via-indigo-500/10 to-transparent blur-[100px] animate-float-3" />
+        <div className="absolute bottom-[-10%] left-[10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-r from-purple-500/8 via-pink-500/5 to-transparent blur-[110px] animate-float-1" style={{ animationDelay: '-12s' }} />
+      </div>
 
       {/* Main Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10">
@@ -255,6 +296,55 @@ export default function App() {
         {/* Centered Campaign Builder Section */}
         <div id="campaign-builder-section" className="max-w-xl mx-auto w-full scroll-mt-6">
           <CampaignBuilder onCampaignCreated={handleCampaignCreated} />
+        </div>
+
+        {/* Live Traffic Feed Module */}
+        <div className="max-w-xl mx-auto w-full glass-card p-5 border border-white/10 relative overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.3)] transition-all hover:border-pink-500/10">
+          {/* Animated pulsing status */}
+          <div className="absolute top-4 right-5 flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 py-1 px-3 rounded-full">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+            <span className="text-[9px] font-mono text-emerald-400 font-bold tracking-wider uppercase">Live Pipe</span>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-xs font-mono uppercase text-indigo-400 font-bold tracking-widest flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-pink-400 animate-pulse" />
+                Global Proxy Pipeline
+              </h3>
+              <p className="text-[10px] text-gray-500 mt-0.5">Real-time delivery status updates from active server meshes.</p>
+            </div>
+
+            <div className="space-y-2 font-mono text-[11px] bg-black/40 border border-white/5 p-3.5 rounded-xl">
+              <AnimatePresence mode="popLayout">
+                {liveActivities.map((act) => (
+                  <motion.div
+                    key={act.id}
+                    initial={{ opacity: 0, x: -10, y: -5 }}
+                    animate={{ opacity: 1, x: 0, y: 0 }}
+                    exit={{ opacity: 0, x: 10, y: 5 }}
+                    transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                    className="flex justify-between items-center py-2 first:pt-0 last:pb-0 border-b border-white/5 last:border-b-0"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-gray-600">[{act.server}]</span>
+                      <span className="text-gray-200 font-bold">@{act.user}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-gray-500 text-[10px]">queued</span>
+                      <span className={`font-black font-display text-[11px] font-bold ${
+                        act.type === 'followers' ? 'text-pink-400' : act.type === 'likes' ? 'text-cyan-400' : 'text-purple-400'
+                      }`}>
+                        +{act.amount.toLocaleString()} {act.type}
+                      </span>
+                      <span className="text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-1 rounded text-[9px]">OK</span>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
 
         {/* Network Cap bento stats */}
