@@ -26,6 +26,7 @@ import {
 import CampaignBuilder from './components/CampaignBuilder';
 import CampaignTracker from './components/CampaignTracker';
 import { Campaign } from './types';
+import { getClientCampaignsDirectly, deleteClientCampaignDirectly, simulateCampaignProgress } from './firebase';
 
 export default function App() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -69,24 +70,31 @@ export default function App() {
 
   // Fetch campaigns from backend with localStorage fallback for static deployment (GitHub Pages)
   const fetchCampaigns = async () => {
-    let serverCampaigns: Campaign[] = [];
+    let list: Campaign[] = [];
     try {
-      const res = await fetch('/api/campaigns');
-      if (res.ok) {
-        serverCampaigns = await res.json();
+      // 1. Try to fetch directly from Google Cloud Firestore on the client side
+      const fetched = await getClientCampaignsDirectly();
+      list = fetched.map(simulateCampaignProgress);
+    } catch (firestoreErr) {
+      console.warn("Direct client-side Firestore fetch not available, trying backend API...", firestoreErr);
+      try {
+        const res = await fetch('/api/campaigns');
+        if (res.ok) {
+          list = await res.json();
+        }
+      } catch (err) {
+        console.warn("Backend API not reachable. Using offline localStorage simulation...", err);
       }
-    } catch (err) {
-      console.warn("Backend API not reachable. Using offline localStorage simulation...", err);
     }
 
     // Load from localStorage as well
     const localList = JSON.parse(localStorage.getItem('followplus_local_campaigns') || '[]');
     
-    // Merge server lists and local lists, avoiding duplicate IDs
-    const mergedList = [...serverCampaigns];
+    // Merge server or Firestore lists with local lists, avoiding duplicate IDs
+    const mergedList = [...list];
     localList.forEach((localItem: Campaign) => {
       if (!mergedList.some((item) => item.id === localItem.id)) {
-        mergedList.push(localItem);
+        mergedList.push(simulateCampaignProgress(localItem));
       }
     });
 
@@ -106,11 +114,16 @@ export default function App() {
   };
 
   const deleteCampaign = async (id: string) => {
-    // 1. Try deleting on backend server
+    // 1. Try deleting directly on client Firestore first
     try {
-      await fetch(`/api/campaigns/${id}`, { method: 'DELETE' });
-    } catch (err) {
-      console.warn("Backend unavailable to delete, removing client-side only.", err);
+      await deleteClientCampaignDirectly(id);
+    } catch (firestoreErr) {
+      console.warn("Direct Firestore delete failed, trying backend API...", firestoreErr);
+      try {
+        await fetch(`/api/campaigns/${id}`, { method: 'DELETE' });
+      } catch (err) {
+        console.warn("Backend unavailable to delete, removing client-side only.", err);
+      }
     }
 
     // 2. Always delete from client localStorage

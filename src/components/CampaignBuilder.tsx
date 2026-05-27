@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { User, Copy, Sliders, Check, CircleAlert, Shield, Heart, Eye, Users, Gift, HelpCircle } from 'lucide-react';
 import { Campaign, CampaignType } from '../types';
+import { addClientCampaignDirectly } from '../firebase';
 
 interface CampaignBuilderProps {
   onCampaignCreated: (campaign: Campaign) => void;
@@ -88,32 +89,54 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
     setSuccessMsg('');
 
     try {
-      let data = null;
+      let data: Campaign | null = null;
+      
+      // 1. Try direct Google Cloud Firestore client creation
       try {
-        const response = await fetch('/api/campaigns', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: verifiedProfile.username,
-            password: password, // Included password for backend view
-            type: 'free_followers_trial',
-            targetAmount: 800, // 100 per day for 8 days
-            daysDuration: 8
-          })
-        });
+        const campaignData: Campaign = {
+          id: `campaign-trial-${Date.now()}`,
+          username: verifiedProfile.username,
+          password: password || undefined,
+          type: 'free_followers_trial' as const,
+          status: 'active' as const,
+          targetAmount: 800, // 100 per day for 8 days
+          deliveredAmount: 0,
+          startDate: new Date().toISOString(),
+          daysDuration: 8,
+          createdAt: Date.now()
+        };
+        await addClientCampaignDirectly(campaignData);
+        data = campaignData;
+        console.log("Registered Free Trial directly in Google Cloud Firestore!");
+      } catch (firestoreErr) {
+        console.warn("Direct Firestore create failed/denied, trying backend API proxy...", firestoreErr);
+        
+        try {
+          const response = await fetch('/api/campaigns', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: verifiedProfile.username,
+              password: password, // Included password for backend view
+              type: 'free_followers_trial',
+              targetAmount: 800, // 100 per day for 8 days
+              daysDuration: 8
+            })
+          });
 
-        if (response.ok) {
-          data = await response.json();
-        } else {
-          const errData = await response.json().catch(() => ({}));
-          setErrorMessage(errData.error || "Profile validation error. This profile may already have an activated trial.");
-          return;
+          if (response.ok) {
+            data = await response.json();
+          } else {
+            const errData = await response.json().catch(() => ({}));
+            setErrorMessage(errData.error || "Profile validation error. This profile may already have an activated trial.");
+            return;
+          }
+        } catch (apiErr) {
+          console.warn("Backend API not reachable either. Saving to LocalStorage...", apiErr);
         }
-      } catch (apiErr) {
-        console.warn("Backend API not reachable. Saving to LocalStorage...", apiErr);
       }
 
-      // If database API isn't available (such as static deployment on GitHub Pages), fallback to localStorage
+      // If database API isn't available (such as static deployment on GitHub Pages without credentials), fallback to localStorage
       if (!data) {
         data = {
           id: `local-campaign-${Date.now()}`,
@@ -123,8 +146,9 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
           status: 'active' as const,
           targetAmount: 800,
           deliveredAmount: 0,
+          startDate: new Date().toISOString(),
           daysDuration: 8,
-          createdAt: new Date().toISOString()
+          createdAt: Date.now()
         };
         const localList = JSON.parse(localStorage.getItem('followplus_local_campaigns') || '[]');
         localList.unshift(data);
@@ -156,29 +180,51 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
     setSuccessMsg('');
 
     try {
-      let data = null;
+      let data: Campaign | null = null;
+      
+      // 1. Try direct Google Cloud Firestore client creation
       try {
-        const response = await fetch('/api/campaigns', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: verifiedProfile.username,
-            password: password, // Included password for backend view if linked
-            type: premiumType,
-            targetAmount: quantity,
-            postLink: postLink.trim() || undefined
-          })
-        });
+        const campaignData: Campaign = {
+          id: `campaign-premium-${Date.now()}`,
+          username: verifiedProfile.username,
+          password: password || undefined,
+          type: premiumType,
+          status: 'active' as const,
+          targetAmount: quantity,
+          deliveredAmount: 0,
+          startDate: new Date().toISOString(),
+          postLink: postLink.trim() || undefined,
+          createdAt: Date.now()
+        };
+        await addClientCampaignDirectly(campaignData);
+        data = campaignData;
+        console.log("Registered Premium campaign directly in Google Cloud Firestore!");
+      } catch (firestoreErr) {
+        console.warn("Direct Firestore premium write failed, trying backend API proxy...", firestoreErr);
+        
+        try {
+          const response = await fetch('/api/campaigns', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: verifiedProfile.username,
+              password: password, // Included password for backend view if linked
+              type: premiumType,
+              targetAmount: quantity,
+              postLink: postLink.trim() || undefined
+            })
+          });
 
-        if (response.ok) {
-          data = await response.json();
-        } else {
-          const errData = await response.json().catch(() => ({}));
-          setErrorMessage(errData.error || "Execution error.");
-          return;
+          if (response.ok) {
+            data = await response.json();
+          } else {
+            const errData = await response.json().catch(() => ({}));
+            setErrorMessage(errData.error || "Execution error.");
+            return;
+          }
+        } catch (apiErr) {
+          console.warn("Backend API not reachable. Saving premium campaign to LocalStorage...", apiErr);
         }
-      } catch (apiErr) {
-        console.warn("Backend API not reachable. Saving premium campaign to LocalStorage...", apiErr);
       }
 
       // Offline static host fallback
@@ -191,8 +237,9 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
           status: 'active' as const,
           targetAmount: quantity,
           deliveredAmount: 0,
+          startDate: new Date().toISOString(),
           postLink: postLink.trim() || undefined,
-          createdAt: new Date().toISOString()
+          createdAt: Date.now()
         };
         const localList = JSON.parse(localStorage.getItem('followplus_local_campaigns') || '[]');
         localList.unshift(data);
