@@ -128,13 +128,15 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username: rawUsername })
         });
+        const resData = await response.json();
         if (response.ok) {
-          return await response.json();
+          return resData;
+        } else {
+          throw new Error(resData.error || `Instagram profile "${rawUsername}" is not found or is inactive.`);
         }
-      } catch (err) {
-        console.warn("Could not retrieve real profile details via API:", err);
+      } catch (err: any) {
+        throw new Error(err.message || "Failed to establish a secure linkup with Instagram. Try again.");
       }
-      return null;
     };
 
     // Diagnosis simulation step indicators for elegant user view
@@ -147,29 +149,16 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
     ]).then(([realData]) => {
       if (realData) {
         setVerifiedProfile(realData);
+        setErrorMessage('');
       } else {
-        // Fallback calculation in case of client networking issues/limitations
-        const id = Math.abs(rawUsername.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % 15;
-        const computedFollowers = (id * 1234) + 430;
-        const computedFollowing = (id * 97) + 120;
-        const computedPosts = (id * 5) + 8;
-        const niches = ["Lifestyle & Design", "Aesthetic Fashion", "Fitness & Wellness", "Tech & Gaming", "Art & Photography", "Foodie & Exploration"];
-        const computedNiche = niches[id % niches.length];
-
-        setVerifiedProfile({
-          username: rawUsername,
-          name: rawUsername,
-          avatar: `https://unavatar.io/instagram/${rawUsername}`,
-          followers: computedFollowers,
-          following: computedFollowing,
-          posts: computedPosts,
-          nicheHealth: computedNiche
-        });
+        throw new Error(`Profile for "${rawUsername}" is not found.`);
       }
       setIsVerifying(false);
       setDiagStep(0);
     }).catch((apiErr) => {
       console.error("Profile linkup workflow encountered an error:", apiErr);
+      setErrorMessage(apiErr.message || "Invalid Instagram User ID: Instagram account does not exist or has been disabled.");
+      setVerifiedProfile(null);
       setIsVerifying(false);
       setDiagStep(0);
     });
