@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, TrendingUp, Zap, CheckCircle2, Copy, Calendar, Award, Compass, Search, Loader2 } from 'lucide-react';
 import { GrowthStrategy } from '../types';
+import ScrambledText from './ScrambledText';
+import ScrollReveal from './ScrollReveal';
 
 interface AIGrowthOptimizerProps {
   onStrategyGenerated?: (strategy: GrowthStrategy) => void;
@@ -189,12 +191,12 @@ export default function AIGrowthOptimizer({ onStrategyGenerated }: AIGrowthOptim
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-[#ec4899]/10 border border-[#ec4899]/20 text-[#ec4899] mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-[#dfb24c]/10 border border-[#dfb24c]/20 text-[#dfb24c] mb-3">
             <Sparkles className="w-3.5 h-3.5" />
             AI DEEP ENGINE
           </div>
           <h2 className="text-2xl font-display font-medium text-white tracking-tight">
-            Follow Plus <span className="text-luxury-gradient">AI Growth Coach</span>
+            Follow Plus <span className="text-luxury-gradient"><ScrambledText text="AI Growth Coach" /></span>
           </h2>
           <p className="text-slate-400 text-sm mt-1">
             Engineered server-side with Gemini 3.5 to reverse-engineer your niche algorithm score.
@@ -216,14 +218,14 @@ export default function AIGrowthOptimizer({ onStrategyGenerated }: AIGrowthOptim
               <div className="space-y-2">
                 <label className="block text-xs font-mono uppercase text-slate-400 font-medium">Instagram Username</label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#ec4899] font-mono">@</span>
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#dfb24c] font-mono">@</span>
                   <input 
                     type="text" 
                     required
                     placeholder="kim_jones" 
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full bg-black/45 border border-white/10 rounded-xl py-3 pl-9 pr-4 text-white placeholder-slate-650 focus:outline-none focus:border-[#ec4899] transition-all text-sm font-mono shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]"
+                    className="w-full bg-black/45 border border-white/10 rounded-xl py-3 pl-9 pr-4 text-white placeholder-slate-650 focus:outline-none focus:border-[#dfb24c] transition-all text-sm font-mono shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]"
                   />
                 </div>
                 <p className="text-[11px] text-slate-500 font-mono">No passwords or credentials required. Public profiles preferred.</p>
@@ -238,7 +240,7 @@ export default function AIGrowthOptimizer({ onStrategyGenerated }: AIGrowthOptim
                     setSelectedNiche(e.target.value);
                     if (e.target.value !== "Other Niche") setCustomNiche('');
                   }}
-                  className="w-full bg-black/45 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#ec4899] transition-all text-sm shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]"
+                  className="w-full bg-black/45 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#dfb24c] transition-all text-sm shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]"
                 >
                   {NICHES.map((n) => (
                     <option key={n} value={n} className="bg-[#121420] text-white">{n}</option>
@@ -254,14 +256,14 @@ export default function AIGrowthOptimizer({ onStrategyGenerated }: AIGrowthOptim
                   animate={{ opacity: 1, height: 'auto' }}
                   className="space-y-2 md:col-span-2"
                 >
-                  <label className="block text-xs font-mono uppercase text-[#ec4899] font-medium">Write Custom Niche</label>
+                  <label className="block text-xs font-mono uppercase text-[#dfb24c] font-medium">Write Custom Niche</label>
                   <input 
                     type="text" 
                     required
                     placeholder="e.g. Minimalist Interior Design or Indie Game Dev" 
                     value={customNiche}
                     onChange={(e) => setCustomNiche(e.target.value)}
-                    className="w-full bg-black/45 border border-[#ec4899]/30 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#ec4899] transition-all text-sm"
+                    className="w-full bg-black/45 border border-[#dfb24c]/30 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#dfb24c] transition-all text-sm"
                   />
                 </motion.div>
               )}
@@ -272,7 +274,7 @@ export default function AIGrowthOptimizer({ onStrategyGenerated }: AIGrowthOptim
                 <select 
                   value={goal}
                   onChange={(e) => setGoal(e.target.value)}
-                  className="w-full bg-black/45 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#ec4899] transition-all text-sm shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]"
+                  className="w-full bg-black/45 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#dfb24c] transition-all text-sm shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]"
                 >
                   <option value="Organic Followers & Profile Authority" className="bg-[#121420]">Max Organic Followers & Authority</option>
                   <option value="Exponential engagement and comments count" className="bg-[#121420]">Viral Reel Engagement & Comments</option>
@@ -287,7 +289,7 @@ export default function AIGrowthOptimizer({ onStrategyGenerated }: AIGrowthOptim
                 <select 
                   value={frequency}
                   onChange={(e) => setFrequency(e.target.value)}
-                  className="w-full bg-black/45 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#ec4899] transition-all text-sm shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]"
+                  className="w-full bg-black/45 border border-white/10 rounded-xl py-3 px-4 text-white focus:outline-none focus:border-[#dfb24c] transition-all text-sm shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)]"
                 >
                   <option value="Every single day (Daily Reel)" className="bg-[#121420]">1+ Post Every Single Day</option>
                   <option value="3-5 Reels / Week" className="bg-[#121420]">3-5 Times a Week (Standard)</option>
@@ -299,9 +301,9 @@ export default function AIGrowthOptimizer({ onStrategyGenerated }: AIGrowthOptim
 
             <button
               type="submit"
-              className="w-full relative group overflow-hidden py-3.5 px-6 rounded-xl font-display font-semibold text-white bg-gradient-to-r from-[#ec4899] to-[#8b5cf6] hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-[#ec4899]/10 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full relative group overflow-hidden py-3.5 px-6 rounded-xl font-display font-semibold text-slate-950 bg-gradient-to-r from-[#dfb24c] to-[#cbd5e1] hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-[#dfb24c]/10 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Zap className="w-5 h-5 fill-white" />
+              <Zap className="w-5 h-5 fill-slate-950" />
               Analyze Account & Deploy AI Strategy
             </button>
           </motion.form>
@@ -317,14 +319,14 @@ export default function AIGrowthOptimizer({ onStrategyGenerated }: AIGrowthOptim
             className="py-12 flex flex-col items-center justify-center text-center space-y-6"
           >
             <div className="relative">
-              <div className="w-20 h-20 rounded-full border border-[#ec4899]/20 flex items-center justify-center">
-                <Loader2 className="w-10 h-10 text-[#ec4899] animate-spin" />
+              <div className="w-20 h-20 rounded-full border border-[#dfb24c]/20 flex items-center justify-center">
+                <Loader2 className="w-10 h-10 text-[#dfb24c] animate-spin" />
               </div>
             </div>
             
             <div className="space-y-2 max-w-md">
               <p className="text-white font-display font-medium text-lg">Follow Plus Engine Active</p>
-              <p className="text-[#ec4899] font-mono text-xs tracking-wider uppercase animate-pulse">
+              <p className="text-[#dfb24c] font-mono text-xs tracking-wider uppercase animate-pulse">
                 {LOADING_STEPS[loadingStep]}
               </p>
               <p className="text-slate-500 text-xs mt-4 font-mono font-sans">

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { User, Copy, Sliders, Check, CircleAlert, Shield, Heart, Eye, Users, Gift, HelpCircle, Sparkles, Clock } from 'lucide-react';
 import { Campaign, CampaignType } from '../types';
 import { addClientCampaignDirectly } from '../firebase';
+import ScrambledText from './ScrambledText';
 
 interface CampaignBuilderProps {
   onCampaignCreated: (campaign: Campaign) => void;
@@ -399,7 +400,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
       <div className="space-y-6 relative z-10">
         <div>
           <h3 className="text-base sm:text-lg font-display font-medium text-white flex items-center gap-2">
-            Diagnostic Linkup 🔍
+            <ScrambledText text="Diagnostic Linkup 🔍" />
           </h3>
           <p className="text-slate-400 text-xs mt-1 leading-relaxed">
             Specify public Instagram handle and target account password to link up securely and configure real-time organic delivery.
@@ -439,7 +440,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
               <button
                 onClick={handleVerify}
                 disabled={isVerifying || !username.trim() || !password.trim()}
-                className="w-full sm:w-auto bg-gradient-to-r from-[#dfb24c] to-[#f4d081] hover:brightness-115 active:scale-95 text-slate-950 py-3.5 px-8 rounded-lg font-display font-semibold text-xs uppercase tracking-wider transition-all cursor-pointer disabled:opacity-30 self-end"
+                className="w-full sm:w-auto shimmer-button-bg hover:brightness-115 active:scale-95 text-slate-950 py-3.5 px-8 rounded-lg font-display font-semibold text-xs uppercase tracking-wider transition-all cursor-pointer disabled:opacity-30 self-end shadow-lg shadow-[#dfb24c]/20 transform-gpu hover:-translate-y-0.5"
               >
                 {isVerifying ? "Verifying Credentials & Syncing... 🔍" : "Order"}
               </button>
@@ -546,7 +547,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
             <div className="space-y-6">
               <div>
                 <h3 className="text-base sm:text-lg font-display font-medium text-white flex items-center gap-2">
-                  Start Complementary Suite 🎁
+                  <ScrambledText text="Start Complementary Suite 🎁" />
                 </h3>
                 <p className="text-slate-400 text-xs mt-1 leading-relaxed">
                   Register your first-user complimentary quota. You will receive <span className="text-white font-semibold">100 premium organic profiles daily for 8 consecutive days</span> (800 in total). Pure safe organic trickle.
@@ -581,7 +582,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
 
               <button
                 onClick={handleFreeActivation}
-                className="w-full py-4 rounded-lg font-display font-semibold text-xs uppercase tracking-wider text-slate-950 bg-gradient-to-r from-[#dfb24c] to-[#f4d081] hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                className="w-full py-4 rounded-lg font-display font-semibold text-xs uppercase tracking-wider text-slate-950 shimmer-button-bg hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#dfb24c]/20 transform-gpu hover:-translate-y-0.5"
               >
                 <Gift className="w-4.5 h-4.5" />
                 Deploy Free 8-Day Followers Campaign Now ✧
@@ -592,7 +593,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
             <form onSubmit={handlePremiumSubmit} className="space-y-6">
               <div>
                 <h3 className="text-base sm:text-lg font-display font-medium text-white">
-                  Customize Boost Properties 🎯
+                  <ScrambledText text="Customize Boost Properties 🎯" />
                 </h3>
                 <p className="text-slate-400 text-xs mt-1 leading-relaxed">
                   Scale your outreach and status authority with high quality fast-retention delivery channels.
@@ -687,7 +688,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
 
               <button
                 type="submit"
-                className="w-full py-4 rounded-lg font-display font-semibold text-xs uppercase tracking-wider text-slate-950 bg-gradient-to-r from-[#dfb24c] to-[#f4d081] hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
+                className="w-full py-4 rounded-lg font-display font-semibold text-xs uppercase tracking-wider text-slate-950 shimmer-button-bg hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#dfb24c]/20 transform-gpu hover:-translate-y-0.5"
               >
                 Activate Premium Campaign Boost ✧
               </button>
@@ -784,7 +785,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
                     setShowDeliveryBanner(false);
                     resetForm();
                   }}
-                  className="w-full py-3 rounded-lg font-display font-semibold text-xs tracking-wider text-slate-950 bg-gradient-to-r from-[#dfb24c] to-[#f4d081] hover:brightness-110 active:scale-95 transition-all cursor-pointer"
+                  className="w-full py-3 rounded-lg font-display font-semibold text-xs tracking-wider text-slate-950 shimmer-button-bg hover:brightness-110 active:scale-95 transition-all cursor-pointer shadow-md shadow-[#dfb24c]/10"
                 >
                   Thik hai / Done 👍
                 </button>

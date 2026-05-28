@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, useScroll, useSpring } from 'motion/react';
 import { 
   Zap, 
   HelpCircle, 
@@ -24,12 +24,23 @@ import {
 } from 'lucide-react';
 
 import CampaignBuilder from './components/CampaignBuilder';
+import ScrambledText from './components/ScrambledText';
+import ScrollReveal from './components/ScrollReveal';
 import { Campaign } from './types';
 import { getClientCampaignsDirectly, deleteClientCampaignDirectly, simulateCampaignProgress } from './firebase';
 
 export default function App() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [showFirstUserGreeting, setShowFirstUserGreeting] = useState(true);
+
+  // Elite GPU-accelerated scroll tracking bypassing React render loops entirely
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 24,
+    restDelta: 0.001
+  });
+
   
   // Real-time live activity feed state representing simulated proxy events
   const [liveActivities, setLiveActivities] = useState([
@@ -168,14 +179,23 @@ export default function App() {
       className="min-h-screen relative overflow-hidden text-slate-300 selection:bg-[#dfb24c]/20 selection:text-[#f4d081] font-sans pb-20"
       style={{ backgroundColor: '#060709' }}
     >
+      {/* Floating Premium Scroll Progress Indicator */}
+      <motion.div 
+        className="fixed top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#dfb24c] via-[#f4d081] to-[#dfb24c] z-[200] origin-left shadow-[0_0_12px_#dfb24c] pointer-events-none" 
+        style={{ scaleX }}
+      />
+
       {/* Subtle Luxury Grid Overlay */}
       <div className="absolute inset-0 premium-grid opacity-[0.25] z-0" />
 
+      {/* Retro-Luxury Cinematic Noise Overlay */}
+      <div className="absolute inset-0 noise-overlay pointer-events-none z-[190]" />
+
       {/* Elegant Ambient Gold Orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-25%] left-[-15%] w-[70vw] h-[70vw] rounded-full bg-gradient-to-tr from-[#dfb24c]/5 to-transparent blur-[160px]" />
-        <div className="absolute bottom-[5%] right-[-15%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-br from-[#dfb24c]/4 to-transparent blur-[160px]" />
-        <div className="absolute top-[30%] left-[30%] w-[45vw] h-[45vw] rounded-full bg-[#f4d081]/3 blur-[140px]" />
+        <div className="absolute top-[-25%] left-[-15%] w-[70vw] h-[70vw] rounded-full bg-gradient-to-tr from-[#dfb24c]/5 to-transparent blur-[160px] pulse-gold-orb" />
+        <div className="absolute bottom-[5%] right-[-15%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-br from-[#dfb24c]/4 to-transparent blur-[160px] pulse-gold-orb" style={{ animationDelay: '2.5s' }} />
+        <div className="absolute top-[30%] left-[30%] w-[45vw] h-[45vw] rounded-full bg-[#f4d081]/3 blur-[140px] float-effect" />
       </div>
 
       {/* Main Container */}
@@ -197,7 +217,7 @@ export default function App() {
             
             <div>
               <h1 className="text-2xl font-display font-medium text-white tracking-tight flex items-center gap-2">
-                <span className="text-luxury-gradient tracking-tight font-semibold">FollowPlus</span>
+                <ScrambledText text="FollowPlus" className="text-luxury-gradient tracking-tight font-semibold" />
                 <span className="text-[9px] uppercase font-mono tracking-widest bg-[#dfb24c]/10 text-[#dfb24c] font-medium py-0.5 px-3 rounded-full border border-[#dfb24c]/20">
                   Gold Suite
                 </span>
@@ -216,138 +236,148 @@ export default function App() {
           </div>
         </header>
 
-        {/* Elegant Gold Editorial Showcase Banner */}
-        {showFirstUserGreeting && (
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, height: 0 }}
-            className="relative overflow-hidden premium-card p-8 border border-[#dfb24c]/15"
-          >
-            {/* Subtle light gold gradient aura */}
-            <div className="absolute top-0 right-0 w-[420px] h-[400px] bg-gradient-to-bl from-[#dfb24c]/5 via-transparent to-transparent rounded-full blur-[90px] pointer-events-none" />
-            
-            <div className="space-y-5 max-w-4xl relative z-10">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#dfb24c]/5 border border-[#dfb24c]/15 text-[#dfb24c] text-[10px] font-medium tracking-wider uppercase font-mono">
-                ✦ Executive Premium Access Enabled
-              </div>
-              
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-medium text-white tracking-tight leading-tight">
-                Unlock 8 Days of <span className="text-luxury-gradient font-bold drop-shadow-sm">Complimentary Channel Booster.</span>
-              </h2>
-              
 
-              
-              {/* Feature Horizontal Pill Badges */}
-              <div className="flex flex-wrap gap-2.5 pt-2">
-                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/[0.02] border border-white/5 rounded-full text-xs text-slate-300 font-mono">
-                  <Users className="w-3.5 h-3.5 text-[#dfb24c]" />
-                  <span>800 Premium Profiles</span>
-                </div>
-                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/[0.02] border border-white/5 rounded-full text-xs text-slate-300 font-mono">
-                  <Heart className="w-3.5 h-3.5 text-[#dfb24c]" />
-                  <span>Gradual delivery routing</span>
-                </div>
-                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/[0.02] border border-white/5 rounded-full text-xs text-slate-300 font-mono">
-                  <Eye className="w-3.5 h-3.5 text-[#dfb24c]" />
-                  <span>Organic algorithm safety</span>
-                </div>
-              </div>
-              
-              <div className="flex flex-wrap items-center gap-3 pt-4">
-                <a 
-                  href="#campaign-builder-section"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    document.getElementById('campaign-builder-section')?.scrollIntoView({ behavior: 'smooth' });
-                  }}
-                  className="px-6 py-3 bg-gradient-to-r from-[#dfb24c] via-[#f4d081] to-[#dfb24c] hover:brightness-110 text-slate-950 font-display font-semibold rounded-lg active:scale-98 transition-all text-xs tracking-wide cursor-pointer shadow-lg shadow-[#dfb24c]/10"
-                >
-                  Configure My Golden Campaign ✧
-                </a>
-                <button 
-                  onClick={() => setShowFirstUserGreeting(false)}
-                  className="px-4 py-3 bg-white/[0.03] border border-white/10 text-slate-400 hover:text-white transition-all text-xs font-mono rounded-lg hover:bg-white/5 cursor-pointer"
-                >
-                  Dismiss
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
 
-        {/* Centered Campaign Builder Section */}
-        <div id="campaign-builder-section" className="max-w-xl mx-auto w-full scroll-mt-6">
-          <CampaignBuilder onCampaignCreated={handleCampaignCreated} />
+
+        {/* Dynamic Main Workspace Content */}
+        <div className="relative z-10 w-full min-h-[400px] space-y-12">
+          {/* Elegant Gold Editorial Showcase Banner */}
+          {showFirstUserGreeting && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, height: 0 }}
+              className="relative overflow-hidden premium-card p-8 border border-[#dfb24c]/15"
+            >
+              {/* Subtle light gold gradient aura */}
+              <div className="absolute top-0 right-0 w-[420px] h-[400px] bg-gradient-to-bl from-[#dfb24c]/5 via-transparent to-transparent rounded-full blur-[90px] pointer-events-none" />
+              
+              <div className="space-y-5 max-w-4xl relative z-10">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#dfb24c]/5 border border-[#dfb24c]/15 text-[#dfb24c] text-[10px] font-medium tracking-wider uppercase font-mono">
+                  ✦ <ScrambledText text="Executive Premium Access Enabled" />
+                </div>
+                
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-medium text-white tracking-tight leading-tight">
+                  Unlock 8 Days of <ScrambledText text="Complimentary Channel Booster" className="text-luxury-gradient font-bold drop-shadow-sm font-display" />
+                </h2>
+
+                {/* Feature Horizontal Pill Badges */}
+                <div className="flex flex-wrap gap-2.5 pt-2">
+                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/[0.02] border border-white/5 rounded-full text-xs text-slate-300 font-mono">
+                    <Users className="w-3.5 h-3.5 text-[#dfb24c]" />
+                    <ScrambledText text="800 Premium Profiles" />
+                  </div>
+                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/[0.02] border border-white/5 rounded-full text-xs text-slate-300 font-mono">
+                    <Heart className="w-3.5 h-3.5 text-[#dfb24c]" />
+                    <ScrambledText text="Gradual delivery routing" />
+                  </div>
+                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/[0.02] border border-white/5 rounded-full text-xs text-slate-300 font-mono">
+                    <Eye className="w-3.5 h-3.5 text-[#dfb24c]" />
+                    <ScrambledText text="Organic algorithm safety" />
+                  </div>
+                </div>
+                
+                <div className="flex flex-wrap items-center gap-3 pt-4">
+                  <a 
+                    href="#campaign-builder-section-id"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById('campaign-builder-section-id')?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="px-6 py-3 shimmer-button-bg text-slate-950 font-display font-semibold rounded-lg active:scale-98 transition-all text-xs tracking-wide cursor-pointer shadow-lg shadow-[#dfb24c]/15 transform-gpu hover:-translate-y-0.5"
+                  >
+                    Configure My Golden Campaign ✧
+                  </a>
+                  <button 
+                    onClick={() => setShowFirstUserGreeting(false)}
+                    className="px-4 py-3 bg-white/[0.03] border border-white/10 text-slate-400 hover:text-white transition-all text-xs font-mono rounded-lg hover:bg-white/5 cursor-pointer"
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Centered Campaign Builder Section */}
+          <div id="campaign-builder-section-id" className="max-w-xl mx-auto w-full scroll-mt-6">
+            <CampaignBuilder onCampaignCreated={handleCampaignCreated} />
+          </div>
         </div>
 
         {/* Live Traffic Feed Module */}
-        <div className="max-w-xl mx-auto w-full premium-card p-6 border border-white/5 relative overflow-hidden">
-          {/* Status Indicator */}
-          <div className="absolute top-5 right-5 flex items-center gap-1.5 bg-[#10b981]/10 border border-[#10b981]/20 py-1 px-3 rounded-full">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-            <span className="text-[9px] font-mono text-[#10b981] font-bold tracking-wider uppercase">Live 📡</span>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-xs font-mono uppercase text-[#dfb24c] font-semibold tracking-widest flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-[#dfb24c] animate-pulse" />
-                Live Order Process Status ⚡
-              </h3>
+        <ScrollReveal delay={0.1} direction="up">
+          <div className="max-w-xl mx-auto w-full premium-card p-6 border border-white/5 relative overflow-hidden">
+            {/* Status Indicator */}
+            <div className="absolute top-5 right-5 flex items-center gap-1.5 bg-[#10b981]/10 border border-[#10b981]/20 py-1 px-3 rounded-full">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+              <span className="text-[9px] font-mono text-[#10b981] font-bold tracking-wider uppercase">Live 📡</span>
             </div>
 
-            <div className="space-y-2 font-mono text-[11px] bg-black/45 border border-white/5 p-4 rounded-xl shadow-inner">
-              <AnimatePresence mode="popLayout">
-                {liveActivities.map((act) => (
-                  <motion.div
-                    key={act.id}
-                    initial={{ opacity: 0, x: -8, y: -4 }}
-                    animate={{ opacity: 1, x: 0, y: 0 }}
-                    exit={{ opacity: 0, x: 8, y: 4 }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                    className="flex justify-between items-center py-2 first:pt-0 last:pb-0 border-b border-white/5 last:border-b-0"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span className="text-slate-300 font-medium">@{act.user}</span>
-                    </div>
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-xs font-mono uppercase text-[#dfb24c] font-semibold tracking-widest flex items-center gap-2">
+                  <Sparkles className="w-3.5 h-3.5 text-[#dfb24c] animate-pulse" />
+                  Live Order Process Status ⚡
+                </h3>
+              </div>
 
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-white">
-                        +{act.amount.toLocaleString()} {act.type}
-                      </span>
-                      <span className="text-[#10b981] font-bold bg-[#10b981]/10 border border-[#10b981]/20 px-1 rounded text-[9px] scale-95 font-mono">OK</span>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+              <div className="space-y-2 font-mono text-[11px] bg-black/45 border border-white/5 p-4 rounded-xl shadow-inner">
+                <AnimatePresence mode="popLayout">
+                  {liveActivities.map((act) => (
+                    <motion.div
+                      key={act.id}
+                      initial={{ opacity: 0, x: -8, y: -4 }}
+                      animate={{ opacity: 1, x: 0, y: 0 }}
+                      exit={{ opacity: 0, x: 8, y: 4 }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                      className="flex justify-between items-center py-2 first:pt-0 last:pb-0 border-b border-white/5 last:border-b-0"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-300 font-medium">@{act.user}</span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-white">
+                          +{act.amount.toLocaleString()} {act.type}
+                        </span>
+                        <span className="text-[#10b981] font-bold bg-[#10b981]/10 border border-[#10b981]/20 px-1 rounded text-[9px] scale-95 font-mono">OK</span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
-        </div>
+        </ScrollReveal>
 
         {/* Network Cap bento stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-          {[
-            { label: 'DELIVERED WORLDWIDE', val: '438,219', desc: '+12.4% vs yesterday', icon: Users, color: 'text-[#dfb24c]' },
-            { label: 'GLOBAL PROXY REALMS', val: '2,841 Nodes', desc: 'Secure decentralized mesh', icon: Server, color: 'text-slate-300' },
-            { label: 'PROVEN RETENTION RATE', val: '97.4%', desc: 'Optimized index consistency', icon: TrendingUp, color: 'text-[#dfb24c]' },
-            { label: 'SECURITY INTEGRITY', val: '100% Secure', desc: 'Private routing safeguard', icon: ShieldCheck, color: 'text-emerald-400' }
-          ].map((stat, i) => {
-            const Icon = stat.icon;
-            return (
-              <div key={i} className="premium-card rounded-xl p-5 border border-white/5 flex flex-col justify-between">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase text-slate-400 tracking-wider font-semibold">{stat.label}</span>
-                  <Icon className={`w-4 h-4 ${stat.color} opacity-85`} />
+        <ScrollReveal delay={0.2} direction="up">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              { label: 'DELIVERED WORLDWIDE', val: '438,219', desc: '+12.4% vs yesterday', icon: Users, color: 'text-[#dfb24c]' },
+              { label: 'GLOBAL PROXY REALMS', val: '2,841 Nodes', desc: 'Secure decentralized mesh', icon: Server, color: 'text-slate-300' },
+              { label: 'PROVEN RETENTION RATE', val: '97.4%', desc: 'Optimized index consistency', icon: TrendingUp, color: 'text-[#dfb24c]' },
+              { label: 'SECURITY INTEGRITY', val: '100% Secure', desc: 'Private routing safeguard', icon: ShieldCheck, color: 'text-emerald-400' }
+            ].map((stat, i) => {
+              const Icon = stat.icon;
+              return (
+                <div key={i} className="premium-card rounded-xl p-5 border border-white/5 flex flex-col justify-between">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono uppercase text-slate-400 tracking-wider font-semibold">
+                      <ScrambledText text={stat.label} />
+                    </span>
+                    <Icon className={`w-4 h-4 ${stat.color} opacity-85`} />
+                  </div>
+                  <div className="mt-4">
+                    <span className="font-display font-semibold text-white text-lg tracking-tight block">{stat.val}</span>
+                    <span className="text-[10px] text-slate-450 font-mono block mt-1">{stat.desc}</span>
+                  </div>
                 </div>
-                <div className="mt-4">
-                  <span className="font-display font-semibold text-white text-lg tracking-tight block">{stat.val}</span>
-                  <span className="text-[10px] text-slate-450 font-mono block mt-1">{stat.desc}</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        </ScrollReveal>
 
         {/* Footer info representing modern aesthetics */}
         <footer className="pt-10 border-t border-white/5 text-center text-xs text-slate-550 space-y-4">

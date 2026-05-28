@@ -78,9 +78,9 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
   }, [campaigns]);
 
   const getCampaignIcon = (type: string) => {
-    if (type === 'likes') return <Heart className="w-4 h-4 text-[#ec4899]" />;
+    if (type === 'likes') return <Heart className="w-4 h-4 text-[#dfb24c]" />;
     if (type === 'views') return <Eye className="w-4 h-4 text-[#fcd34d]" />;
-    return <Users className="w-4 h-4 text-[#8b5cf6]" />;
+    return <Users className="w-4 h-4 text-[#dfb24c]" />;
   };
 
   const getFriendlyType = (type: string) => {
@@ -98,7 +98,7 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-display font-medium text-white tracking-tight flex items-center gap-2">
-            <Layers className="w-5 h-5 text-[#ec4899]" />
+            <Layers className="w-5 h-5 text-[#dfb24c]" />
             Live Delivery Console
           </h2>
           <p className="text-slate-400 text-xs mt-0.5 font-sans">
@@ -137,7 +137,7 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
                   onClick={() => setActiveLogCampaignId(c.id)}
                   className={`p-5 rounded-xl border transition-all cursor-pointer pointer-events-auto relative overflow-hidden flex flex-col gap-4 ${
                     isActive 
-                      ? 'bg-[#0e111a]/75 border-[#ec4899]/30 shadow-lg shadow-[#ec4899]/5' 
+                      ? 'bg-[#0e111a]/75 border-[#dfb24c]/30 shadow-lg shadow-[#dfb24c]/5' 
                       : 'bg-[#0e111a]/40 border-white/5 hover:border-white/10 hover:bg-[#0e111a]/60'
                   }`}
                 >
@@ -163,7 +163,7 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
                       {c.status === 'completed' ? (
                         <CheckCircle className="w-5 h-5 text-emerald-400" />
                       ) : (
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#ec4899] animate-pulse shrink-0" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#dfb24c] animate-pulse shrink-0" />
                       )}
                     </div>
                   </div>
@@ -182,7 +182,7 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
                         initial={{ width: 0 }}
                         animate={{ width: `${pct}%` }}
                         transition={{ duration: 0.8, ease: 'easeOut' }}
-                        className="h-full bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#fcd34d] rounded-full"
+                        className="h-full bg-gradient-to-r from-[#dfb24c] via-[#f4d081] to-[#dfb24c] rounded-full"
                       />
                     </div>
                   </div>
@@ -194,7 +194,7 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
                         <span className="text-slate-450 flex items-center gap-1 font-mono uppercase tracking-wider text-[11px]">
                           📅 8-Day followers scheduler Timeline
                         </span>
-                        <span className="text-[11px] font-mono text-[#ec4899] font-medium uppercase tracking-wider">100 Followers / day</span>
+                        <span className="text-[11px] font-mono text-[#dfb24c] font-medium uppercase tracking-wider">100 Followers / day</span>
                       </div>
                       
                       {/* Grid representation for 8 distinct calendar blocks */}
@@ -216,7 +216,7 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
                                 isDone 
                                   ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-450' 
                                   : isCurrent 
-                                    ? 'bg-[#ec4899]/10 border-[#ec4899]/40 text-rose-300 animate-pulse' 
+                                    ? 'bg-[#dfb24c]/10 border-[#dfb24c]/40 text-amber-250 animate-pulse' 
                                     : 'bg-black/30 border-white/5 text-slate-600'
                               }`}
                             >
@@ -243,7 +243,7 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
                       onClick={(e) => e.stopPropagation()} // retain tab selectors clicking inside logs
                     >
                       <div className="flex items-center gap-1.5 text-xs text-slate-400 font-mono">
-                        <Terminal className="w-3.5 h-3.5 text-[#ec4899]" />
+                        <Terminal className="w-3.5 h-3.5 text-[#dfb24c]" />
                         <span>INTEGRATED SYSTEM DIAGNOSTICS LOGS</span>
                       </div>
                       
