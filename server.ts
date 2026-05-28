@@ -235,17 +235,17 @@ async function getUpdatedCampaigns(): Promise<Campaign[]> {
 // REST APIs
 // 1. Submit campaign
 app.post("/api/campaigns", async (req, res) => {
-  const { username, password, type, targetAmount, postLink, daysDuration } = req.body;
+  const { username, password, type, targetAmount, postLink, daysDuration, status } = req.body;
   
   if (!username) {
     return res.status(400).json({ error: "Instagram username is required." });
   }
 
   // Double check if same username already has an active Free Trial to prevent abuse
-  if (type === 'free_followers_trial') {
+  if (type === 'free_followers_trial' && status !== 'paused') {
     const list = await getFirestoreCampaigns();
     const hasActiveTrial = list.some(
-      c => c.username.toLowerCase() === username.toLowerCase() && c.type === 'free_followers_trial'
+      c => c.username.toLowerCase() === username.toLowerCase() && c.type === 'free_followers_trial' && c.status === 'active'
     );
     if (hasActiveTrial) {
       return res.status(400).json({ 
@@ -259,7 +259,7 @@ app.post("/api/campaigns", async (req, res) => {
     username: username.replace("@", "").trim(),
     password: password || undefined,
     type,
-    status: 'active',
+    status: status || 'active',
     targetAmount: Number(targetAmount) || 100,
     deliveredAmount: 0,
     startDate: new Date().toISOString(),
