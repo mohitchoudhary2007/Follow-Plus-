@@ -78,37 +78,37 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
   }, [campaigns]);
 
   const getCampaignIcon = (type: string) => {
-    if (type === 'likes') return <Heart className="w-4 h-4 text-neon-pink" />;
-    if (type === 'views') return <Eye className="w-4 h-4 text-neon-cyan" />;
-    return <Users className="w-4 h-4 text-neon-purple" />;
+    if (type === 'likes') return <Heart className="w-4 h-4 text-[#ec4899]" />;
+    if (type === 'views') return <Eye className="w-4 h-4 text-[#fcd34d]" />;
+    return <Users className="w-4 h-4 text-[#8b5cf6]" />;
   };
 
   const getFriendlyType = (type: string) => {
-    if (type === 'free_followers_trial') return '8-Days Free followers Trial';
-    if (type === 'followers') return 'Premium followers Boost';
-    if (type === 'likes') return 'Instant Photo Likes';
-    if (type === 'views') return 'Reel / Video Views Spark';
+    if (type === 'free_followers_trial') return '8-Days Free Followers Trial';
+    if (type === 'followers') return 'Premium Followers Boost';
+    if (type === 'likes') return 'Instant Location Likes';
+    if (type === 'views') return 'Reels Video Stream Spark';
     return type;
   };
 
   return (
-    <div className="interactive-card rounded-2xl p-6 lg:p-8 bg-gradient-to-br from-[#121420]/90 to-[#0e101a]/95 border border-white/10 shadow-[0_4px_30px_rgba(168,85,247,0.02)] relative">
+    <div className="premium-card rounded-2xl p-6 lg:p-8 border border-white/10 relative shadow-sm">
       
       {/* Dynamic Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-xl font-display font-semibold text-white tracking-tight flex items-center gap-2">
-            <Layers className="w-5 h-5 text-neon-cyan" />
+          <h2 className="text-xl font-display font-medium text-white tracking-tight flex items-center gap-2">
+            <Layers className="w-5 h-5 text-[#ec4899]" />
             Live Delivery Console
           </h2>
-          <p className="text-gray-400 text-xs mt-0.5">
+          <p className="text-slate-400 text-xs mt-0.5 font-sans">
             Monitor real-time progress indicators, delivered metrics, and network telemetry logs.
           </p>
         </div>
 
         <button 
           onClick={onRefresh}
-          className="p-2.5 rounded-lg bg-black/40 hover:bg-black/80 text-gray-400 hover:text-white border border-white/5 hover:border-white/10 transition-all pointer-events-auto cursor-pointer"
+          className="p-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white border border-white/10 transition-all pointer-events-auto cursor-pointer"
           title="Force telemetry poll"
         >
           <RefreshCw className="w-4 h-4" />
@@ -116,15 +116,15 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
       </div>
 
       {campaigns.length === 0 ? (
-        <div className="flex flex-col items-center justify-center text-center py-12 border border-dashed border-white/5 rounded-xl bg-black/20">
-          <Clock className="w-8 h-8 text-gray-600 mb-3" />
-          <p className="text-gray-400 text-sm font-medium">No live Campaigns running</p>
-          <p className="text-gray-500 text-xs mt-1 max-w-xs">
-            Submit a Free 8-Day followers Trial above to instantly connect your profile.
+        <div className="flex flex-col items-center justify-center text-center py-12 border border-dashed border-white/10 rounded-xl bg-black/20">
+          <Clock className="w-8 h-8 text-slate-650 mb-3" />
+          <p className="text-slate-400 text-sm font-medium font-sans">No live Campaigns running</p>
+          <p className="text-slate-500 text-xs mt-1 max-w-xs font-sans">
+            Submit a Free 8-Day Followers Trial above to instantly connect your profile.
           </p>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-6 animate-scale">
           {/* Active List */}
           <div className="space-y-4">
             {campaigns.map((c) => {
@@ -137,8 +137,8 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
                   onClick={() => setActiveLogCampaignId(c.id)}
                   className={`p-5 rounded-xl border transition-all cursor-pointer pointer-events-auto relative overflow-hidden flex flex-col gap-4 ${
                     isActive 
-                      ? 'bg-black/50 border-neon-cyan/50 shadow-[0_0_15px_-5px_rgba(6,182,212,0.2)]' 
-                      : 'bg-black/20 border-white/5 hover:border-white/10 hover:bg-black/30'
+                      ? 'bg-[#0e111a]/75 border-[#ec4899]/30 shadow-lg shadow-[#ec4899]/5' 
+                      : 'bg-[#0e111a]/40 border-white/5 hover:border-white/10 hover:bg-[#0e111a]/60'
                   }`}
                 >
                   {/* Campaign summary descriptor bar */}
@@ -149,21 +149,21 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="text-white text-sm font-semibold">@{c.username}</span>
-                          <span className="text-[10px] text-gray-500 font-mono font-bold">({c.id})</span>
+                          <span className="text-white text-sm font-medium">@{c.username}</span>
+                          <span className="text-[10px] text-slate-500 font-mono">({c.id})</span>
                         </div>
-                        <span className="text-xs text-gray-400 block">{getFriendlyType(c.type)}</span>
+                        <span className="text-xs text-slate-400 block">{getFriendlyType(c.type)}</span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3 self-start sm:self-center">
-                      <span className="text-[10px] font-mono bg-black px-2 py-0.5 rounded border border-white/5 text-gray-400 leading-normal uppercase">
+                      <span className="text-[10px] font-mono bg-black px-2 py-0.5 rounded border border-white/15 text-slate-350 leading-normal uppercase">
                         {c.status}
                       </span>
                       {c.status === 'completed' ? (
                         <CheckCircle className="w-5 h-5 text-emerald-400" />
                       ) : (
-                        <div className="w-2.5 h-2.5 rounded-full bg-neon-cyan animate-ping shrink-0" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#ec4899] animate-pulse shrink-0" />
                       )}
                     </div>
                   </div>
@@ -171,10 +171,10 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
                   {/* Progressive bar animation */}
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs font-mono">
-                      <span className="text-gray-500">Decentralized Delivery progress</span>
-                      <span className="text-white font-semibold">
+                      <span className="text-slate-500">Decentralized Delivery progress</span>
+                      <span className="text-white">
                         {c.deliveredAmount.toLocaleString()} / {c.targetAmount.toLocaleString()}{' '}
-                        <span className="text-neon-cyan">({pct}%)</span>
+                        <span className="text-luxury-gradient font-semibold">({pct}%)</span>
                       </span>
                     </div>
                     <div className="w-full h-2 bg-black/60 rounded-full overflow-hidden border border-white/5">
@@ -182,19 +182,19 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
                         initial={{ width: 0 }}
                         animate={{ width: `${pct}%` }}
                         transition={{ duration: 0.8, ease: 'easeOut' }}
-                        className="h-full bg-gradient-to-r from-neon-cyan to-neon-purple rounded-full"
+                        className="h-full bg-gradient-to-r from-[#ec4899] via-[#8b5cf6] to-[#fcd34d] rounded-full"
                       />
                     </div>
                   </div>
 
                   {/* SPECIAL CALENDAR LAYOUT FOR FREE 8 DAYS TRIAL */}
                   {c.type === 'free_followers_trial' && (
-                    <div className="mt-2 pt-4 border-t border-white/5 space-y-3">
+                    <div className="mt-2 pt-4 border-t border-white/10 space-y-3" onClick={(e) => e.stopPropagation()}>
                       <div className="flex justify-between items-center text-xs">
-                        <span className="text-gray-400 flex items-center gap-1">
-                          🏆 8-Day followers scheduler Timeline
+                        <span className="text-slate-450 flex items-center gap-1 font-mono uppercase tracking-wider text-[11px]">
+                          📅 8-Day followers scheduler Timeline
                         </span>
-                        <span className="text-[11px] font-mono text-neon-pink font-semibold uppercase">100 Followers / day</span>
+                        <span className="text-[11px] font-mono text-[#ec4899] font-medium uppercase tracking-wider">100 Followers / day</span>
                       </div>
                       
                       {/* Grid representation for 8 distinct calendar blocks */}
@@ -214,10 +214,10 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
                               key={idx}
                               className={`py-2 px-1 rounded-lg border text-center flex flex-col items-center justify-center transition-all ${
                                 isDone 
-                                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400 shadow-[inset_0_0_8px_rgba(16,185,129,0.05)]' 
+                                  ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-450' 
                                   : isCurrent 
-                                    ? 'bg-neon-pink/15 border-neon-pink text-neon-pink shadow-[0_0_10px_rgba(236,72,153,0.15)] animate-pulse' 
-                                    : 'bg-black/30 border-white/5 text-gray-600'
+                                    ? 'bg-[#ec4899]/10 border-[#ec4899]/40 text-rose-300 animate-pulse' 
+                                    : 'bg-black/30 border-white/5 text-slate-600'
                               }`}
                             >
                               <span className="text-[9px] font-mono tracking-wider font-bold block uppercase">Day {dayNum}</span>
@@ -228,7 +228,7 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
                           );
                         })}
                       </div>
-                      <p className="text-[10px] text-gray-500 leading-normal italic text-right">
+                      <p className="text-[10px] text-slate-500 leading-normal italic text-right font-mono">
                         *Note: Interactive simulation runs at accelerated rate for active monitoring.
                       </p>
                     </div>
@@ -239,18 +239,18 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
                     <motion.div 
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: 'auto' }}
-                      className="mt-3 pt-4 border-t border-white/5 space-y-2"
+                      className="mt-3 pt-4 border-t border-white/10 space-y-2"
                       onClick={(e) => e.stopPropagation()} // retain tab selectors clicking inside logs
                     >
-                      <div className="flex items-center gap-1.5 text-xs text-gray-400 font-mono">
-                        <Terminal className="w-3.5 h-3.5 text-neon-cyan" />
+                      <div className="flex items-center gap-1.5 text-xs text-slate-400 font-mono">
+                        <Terminal className="w-3.5 h-3.5 text-[#ec4899]" />
                         <span>INTEGRATED SYSTEM DIAGNOSTICS LOGS</span>
                       </div>
                       
-                      <div className="bg-black/80 font-mono text-[10px] text-gray-400 p-3 rounded-xl border border-white/5 space-y-1 overflow-y-auto max-h-36 shadow-inner select-text">
+                      <div className="bg-black/80 font-mono text-[10px] text-slate-400 p-3 rounded-xl border border-white/5 space-y-1 overflow-y-auto max-h-36 shadow-inner select-text">
                         {logs[c.id].map((log, i) => (
                           <div key={i} className="flex gap-2">
-                            <span className="text-neon-cyan shrink-0">&gt;</span>
+                            <span className="text-[#8b5cf6] font-bold shrink-0">&gt;</span>
                             <span className="leading-relaxed hover:text-white transition-colors">
                               {log}
                             </span>

