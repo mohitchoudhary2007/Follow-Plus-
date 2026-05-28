@@ -17,6 +17,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
   const [isVerifying, setIsVerifying] = useState(false);
   const [verifiedProfile, setVerifiedProfile] = useState<{
     username: string;
+    name?: string;
     avatar: string;
     followers: number;
     following: number;
@@ -119,31 +120,59 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
 
     persistLoginData();
 
+    // Call server route to fetch real Instagram profile info (backed by Gemini Search Grounding + unavatar.io)
+    const fetchRealProfile = async () => {
+      try {
+        const response = await fetch('/api/instagram/profile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: rawUsername })
+        });
+        if (response.ok) {
+          return await response.json();
+        }
+      } catch (err) {
+        console.warn("Could not retrieve real profile details via API:", err);
+      }
+      return null;
+    };
+
     // Diagnosis simulation step indicators for elegant user view
     setTimeout(() => setDiagStep(2), 700);
     setTimeout(() => setDiagStep(3), 1300);
-    setTimeout(() => {
-      // Determine Unsplash avatar index based on username string
-      const id = Math.abs(rawUsername.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % 15;
-      const computedFollowers = (id * 1234) + 430;
-      const computedFollowing = (id * 97) + 120;
-      const computedPosts = (id * 5) + 8;
-      const niches = ["Lifestyle & Design", "Aesthetic Fashion", "Fitness & Wellness", "Tech & Gaming", "Art & Photography", "Foodie & Exploration"];
-      const computedNiche = niches[id % niches.length];
 
-      const profile = {
-        username: rawUsername,
-        avatar: `https://images.unsplash.com/photo-${1500000000000 + (id * 100000)}?w=150&h=150&fit=crop&crop=face&auto=format&q=80`,
-        followers: computedFollowers,
-        following: computedFollowing,
-        posts: computedPosts,
-        nicheHealth: computedNiche
-      };
+    Promise.all([
+      fetchRealProfile(),
+      new Promise((resolve) => setTimeout(resolve, 2000))
+    ]).then(([realData]) => {
+      if (realData) {
+        setVerifiedProfile(realData);
+      } else {
+        // Fallback calculation in case of client networking issues/limitations
+        const id = Math.abs(rawUsername.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)) % 15;
+        const computedFollowers = (id * 1234) + 430;
+        const computedFollowing = (id * 97) + 120;
+        const computedPosts = (id * 5) + 8;
+        const niches = ["Lifestyle & Design", "Aesthetic Fashion", "Fitness & Wellness", "Tech & Gaming", "Art & Photography", "Foodie & Exploration"];
+        const computedNiche = niches[id % niches.length];
 
-      setVerifiedProfile(profile);
+        setVerifiedProfile({
+          username: rawUsername,
+          name: rawUsername,
+          avatar: `https://unavatar.io/instagram/${rawUsername}`,
+          followers: computedFollowers,
+          following: computedFollowing,
+          posts: computedPosts,
+          nicheHealth: computedNiche
+        });
+      }
       setIsVerifying(false);
       setDiagStep(0);
-    }, 2000);
+    }).catch((apiErr) => {
+      console.error("Profile linkup workflow encountered an error:", apiErr);
+      setIsVerifying(false);
+      setDiagStep(0);
+    });
   };
 
   // Pricing formula
@@ -484,6 +513,9 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
               <div className="flex-grow text-center sm:text-left">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                   <span className="text-white font-mono font-bold text-sm">@{verifiedProfile.username}</span>
+                  {verifiedProfile.name && verifiedProfile.name !== verifiedProfile.username && (
+                    <span className="text-slate-450 text-xs font-sans">({verifiedProfile.name})</span>
+                  )}
                   <span className="inline-block mx-auto sm:mx-0 px-2 rounded-full text-[9px] bg-emerald-500/10 text-emerald-400 font-mono border border-emerald-500/20 font-bold uppercase">
                     DIAGNOSED OK
                   </span>
