@@ -134,9 +134,9 @@ h1, h2, h3, h4 {
 }
 
 .shimmer-button-bg {
-  background: linear-gradient(90deg, #dfb24c, #f4d081, #fffbeb, #f4d081, #dfb24c);
+  background: linear-gradient(90deg, #eab308, #fef08a, #ffffff, #fef08a, #eab308);
   background-size: 200% auto;
-  animation: gold-shimmer 4s linear infinite;
+  animation: gold-shimmer 3s linear infinite;
 }
 
 .float-effect {

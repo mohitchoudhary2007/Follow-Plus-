@@ -26,6 +26,7 @@ import {
 import CampaignBuilder from './components/CampaignBuilder';
 import ScrambledText from './components/ScrambledText';
 import ScrollReveal from './components/ScrollReveal';
+import SpotlightCard from './components/SpotlightCard';
 import { Campaign } from './types';
 import { getClientCampaignsDirectly, deleteClientCampaignDirectly, simulateCampaignProgress } from './firebase';
 
@@ -40,6 +41,28 @@ export default function App() {
     damping: 24,
     restDelta: 0.001
   });
+
+  // Fluid UI update interval to tick delivery counts smoothly every 2 seconds
+  useEffect(() => {
+    const localTickInterval = setInterval(() => {
+      setCampaigns((prev) => {
+        if (prev.length === 0) return prev;
+        // Run simulation algorithm on each local campaign state
+        return prev.map(simulateCampaignProgress);
+      });
+    }, 2000);
+
+    return () => clearInterval(localTickInterval);
+  }, []);
+
+  // Sync state periodically from backing store (Firestore + LocalStorage) every 8 seconds
+  useEffect(() => {
+    const dbPollInterval = setInterval(() => {
+      fetchCampaigns();
+    }, 8000);
+
+    return () => clearInterval(dbPollInterval);
+  }, []);
 
   
   // Real-time live activity feed state representing simulated proxy events
@@ -303,26 +326,32 @@ export default function App() {
           <div id="campaign-builder-section-id" className="max-w-xl mx-auto w-full scroll-mt-6">
             <CampaignBuilder onCampaignCreated={handleCampaignCreated} />
           </div>
+
         </div>
 
         {/* Live Traffic Feed Module */}
         <ScrollReveal delay={0.1} direction="up">
-          <div className="max-w-xl mx-auto w-full premium-card p-6 border border-white/5 relative overflow-hidden">
+          <SpotlightCard className="max-w-xl mx-auto w-full p-6 border border-white/5 relative overflow-hidden">
             {/* Status Indicator */}
-            <div className="absolute top-5 right-5 flex items-center gap-1.5 bg-[#10b981]/10 border border-[#10b981]/20 py-1 px-3 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-              <span className="text-[9px] font-mono text-[#10b981] font-bold tracking-wider uppercase">Live 📡</span>
+            <div className="absolute top-5 right-5 flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/30 py-1 px-3 rounded-full z-20 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              <span className="text-[9.5px] font-mono text-emerald-400 font-bold tracking-widest uppercase">
+                LIVE 📡
+              </span>
             </div>
 
             <div className="space-y-4">
               <div>
                 <h3 className="text-xs font-mono uppercase text-[#dfb24c] font-semibold tracking-widest flex items-center gap-2">
                   <Sparkles className="w-3.5 h-3.5 text-[#dfb24c] animate-pulse" />
-                  Live Order Process Status ⚡
+                  <ScrambledText text="Live Order Process Status ⚡" />
                 </h3>
               </div>
 
-              <div className="space-y-2 font-mono text-[11px] bg-black/45 border border-white/5 p-4 rounded-xl shadow-inner">
+              <div className="space-y-2 font-mono text-[11px] bg-black/45 border border-white/5 p-4 rounded-xl shadow-inner relative z-10">
                 <AnimatePresence mode="popLayout">
                   {liveActivities.map((act) => (
                     <motion.div
@@ -348,7 +377,7 @@ export default function App() {
                 </AnimatePresence>
               </div>
             </div>
-          </div>
+          </SpotlightCard>
         </ScrollReveal>
 
         {/* Network Cap bento stats */}
@@ -362,7 +391,7 @@ export default function App() {
             ].map((stat, i) => {
               const Icon = stat.icon;
               return (
-                <div key={i} className="premium-card rounded-xl p-5 border border-white/5 flex flex-col justify-between">
+                <SpotlightCard key={i} className="rounded-xl p-5 border border-white/5 flex flex-col justify-between h-full">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-mono uppercase text-slate-400 tracking-wider font-semibold">
                       <ScrambledText text={stat.label} />
@@ -373,7 +402,7 @@ export default function App() {
                     <span className="font-display font-semibold text-white text-lg tracking-tight block">{stat.val}</span>
                     <span className="text-[10px] text-slate-450 font-mono block mt-1">{stat.desc}</span>
                   </div>
-                </div>
+                </SpotlightCard>
               );
             })}
           </div>

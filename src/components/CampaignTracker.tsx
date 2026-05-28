@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Terminal, RefreshCw, Layers, CheckCircle, Clock, Heart, Users, Eye, HelpCircle } from 'lucide-react';
 import { Campaign } from '../types';
+import SpotlightCard from './SpotlightCard';
 
 interface CampaignTrackerProps {
   campaigns: Campaign[];
@@ -92,7 +93,7 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
   };
 
   return (
-    <div className="premium-card rounded-2xl p-6 lg:p-8 border border-white/10 relative shadow-sm">
+    <SpotlightCard className="rounded-2xl p-6 lg:p-8 border border-white/10 relative shadow-sm">
       
       {/* Dynamic Header */}
       <div className="flex items-center justify-between mb-6">
@@ -218,7 +219,7 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
                                   : isCurrent 
                                     ? 'bg-[#dfb24c]/10 border-[#dfb24c]/40 text-amber-250 animate-pulse' 
                                     : 'bg-black/30 border-white/5 text-slate-600'
-                              }`}
+                                }`}
                             >
                               <span className="text-[9px] font-mono tracking-wider font-bold block uppercase">Day {dayNum}</span>
                               <span className="text-xs font-bold mt-1 block">
@@ -265,6 +266,6 @@ export default function CampaignTracker({ campaigns, onRefresh }: CampaignTracke
           </div>
         </div>
       )}
-    </div>
+    </SpotlightCard>
   );
 }

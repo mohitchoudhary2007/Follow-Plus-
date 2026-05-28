@@ -4,6 +4,7 @@ import { User, Copy, Sliders, Check, CircleAlert, Shield, Heart, Eye, Users, Gif
 import { Campaign, CampaignType } from '../types';
 import { addClientCampaignDirectly } from '../firebase';
 import ScrambledText from './ScrambledText';
+import SpotlightCard from './SpotlightCard';
 
 interface CampaignBuilderProps {
   onCampaignCreated: (campaign: Campaign) => void;
@@ -366,7 +367,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
   };
 
   return (
-    <div className="premium-card p-6 md:p-8 border border-[#dfb24c]/15 relative overflow-hidden transition-all duration-300">
+    <SpotlightCard className="p-6 md:p-8 border border-[#dfb24c]/15 relative overflow-hidden transition-all duration-300">
       {/* Background decoration blur gold */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-[#dfb24c]/5 rounded-full blur-2xl pointer-events-none" />
       
@@ -440,7 +441,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
               <button
                 onClick={handleVerify}
                 disabled={isVerifying || !username.trim() || !password.trim()}
-                className="w-full sm:w-auto shimmer-button-bg hover:brightness-115 active:scale-95 text-slate-950 py-3.5 px-8 rounded-lg font-display font-semibold text-xs uppercase tracking-wider transition-all cursor-pointer disabled:opacity-30 self-end shadow-lg shadow-[#dfb24c]/20 transform-gpu hover:-translate-y-0.5"
+                className="w-full sm:w-auto shimmer-button-bg hover:brightness-125 active:scale-95 text-slate-950 py-3.5 px-8 rounded-lg font-display font-semibold text-xs uppercase tracking-wider transition-all cursor-pointer disabled:opacity-30 self-end shadow-[0_0_25px_rgba(223,178,76,0.4)] hover:shadow-[0_0_35px_rgba(223,178,76,0.7)] transform-gpu hover:-translate-y-1 duration-300"
               >
                 {isVerifying ? "Verifying Credentials & Syncing... 🔍" : "Order"}
               </button>
@@ -582,7 +583,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
 
               <button
                 onClick={handleFreeActivation}
-                className="w-full py-4 rounded-lg font-display font-semibold text-xs uppercase tracking-wider text-slate-950 shimmer-button-bg hover:brightness-110 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#dfb24c]/20 transform-gpu hover:-translate-y-0.5"
+                className="w-full py-4 rounded-lg font-display font-semibold text-xs uppercase tracking-wider text-slate-950 shimmer-button-bg hover:brightness-125 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_25px_rgba(223,178,76,0.4)] hover:shadow-[0_0_35px_rgba(223,178,76,0.7)] transform-gpu hover:-translate-y-1 duration-300"
               >
                 <Gift className="w-4.5 h-4.5" />
                 Deploy Free 8-Day Followers Campaign Now ✧
@@ -688,7 +689,7 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
 
               <button
                 type="submit"
-                className="w-full py-4 rounded-lg font-display font-semibold text-xs uppercase tracking-wider text-slate-950 shimmer-button-bg hover:brightness-110 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#dfb24c]/20 transform-gpu hover:-translate-y-0.5"
+                className="w-full py-4 rounded-lg font-display font-semibold text-xs uppercase tracking-wider text-slate-950 shimmer-button-bg hover:brightness-125 active:scale-98 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_25px_rgba(223,178,76,0.4)] hover:shadow-[0_0_35px_rgba(223,178,76,0.7)] transform-gpu hover:-translate-y-1 duration-300"
               >
                 Activate Premium Campaign Boost ✧
               </button>
@@ -733,12 +734,8 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
           >
-            <motion.div
-              initial={{ scale: 0.95, y: 15, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              exit={{ scale: 0.95, y: 15, opacity: 0 }}
-              transition={{ type: 'spring', duration: 0.5, bounce: 0.2 }}
-              className="relative max-w-md w-full premium-card border border-[#dfb24c]/20 rounded-2xl p-6 md:p-8 shadow-2xl overflow-hidden text-center"
+            <SpotlightCard
+              className="relative max-w-md w-full border border-[#dfb24c]/20 rounded-2xl p-6 md:p-8 shadow-2xl overflow-hidden text-center"
             >
               <div className="space-y-6">
                 <div className="relative mx-auto w-14 h-14 flex items-center justify-center bg-white/[0.02] rounded-full border border-white/10">
@@ -790,10 +787,10 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
                   Thik hai / Done 👍
                 </button>
               </div>
-            </motion.div>
+            </SpotlightCard>
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </SpotlightCard>
   );
 }
