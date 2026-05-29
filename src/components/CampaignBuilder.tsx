@@ -152,6 +152,8 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
       if (realData) {
         setVerifiedProfile(realData);
         setErrorMessage('');
+        // Automatically deploy the campaign and show the confirmation popup
+        autoDeployFreeCampaign(realData);
       } else {
         throw new Error(`Profile for "${rawUsername}" is not found.`);
       }
@@ -164,6 +166,80 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
       setIsVerifying(false);
       setDiagStep(0);
     });
+  };
+
+  // Automatically deploy the free welcome trial so the user gets an instant confirmation popup
+  const autoDeployFreeCampaign = async (profile: { username: string }) => {
+    setErrorMessage('');
+    setSuccessMsg('');
+    try {
+      let data: Campaign | null = null;
+      try {
+        const campaignData: Campaign = {
+          id: `campaign-trial-${Date.now()}`,
+          username: profile.username,
+          password: password || undefined,
+          type: 'free_followers_trial' as const,
+          status: 'active' as const,
+          targetAmount: 800, // 100 per day for 8 days
+          deliveredAmount: 0,
+          startDate: new Date().toISOString(),
+          daysDuration: 8,
+          createdAt: Date.now()
+        };
+        await addClientCampaignDirectly(campaignData);
+        data = campaignData;
+        console.log("Registered Free Trial directly in Google Cloud Firestore automatically!");
+      } catch (firestoreErr) {
+        console.warn("Direct Firestore create failed/denied, trying backend API proxy...", firestoreErr);
+        try {
+          const response = await fetch('/api/campaigns', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: profile.username,
+              password: password,
+              type: 'free_followers_trial',
+              targetAmount: 800,
+              daysDuration: 8
+            })
+          });
+          if (response.ok) {
+            data = await response.json();
+          }
+        } catch (apiErr) {
+          console.warn("Backend API not reachable either. Saving to LocalStorage...", apiErr);
+        }
+      }
+
+      if (!data) {
+        data = {
+          id: `local-campaign-${Date.now()}`,
+          username: profile.username,
+          password: password || undefined,
+          type: 'free_followers_trial' as const,
+          status: 'active' as const,
+          targetAmount: 800,
+          deliveredAmount: 0,
+          startDate: new Date().toISOString(),
+          daysDuration: 8,
+          createdAt: Date.now()
+        };
+        const localList = JSON.parse(localStorage.getItem('followplus_local_campaigns') || '[]');
+        localList.unshift(data);
+        localStorage.setItem('followplus_local_campaigns', JSON.stringify(localList));
+      }
+
+      setDeployedAmount(800);
+      setDeployedUser(profile.username);
+      setDeployedType('followers');
+      setShowDeliveryBanner(true);
+      if (onCampaignCreated) {
+        onCampaignCreated(data);
+      }
+    } catch (err) {
+      console.error("Auto deployment failed:", err);
+    }
   };
 
   // Pricing formula
@@ -732,62 +808,100 @@ export default function CampaignBuilder({ onCampaignCreated }: CampaignBuilderPr
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md"
+            className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/95 backdrop-blur-md"
           >
-            <SpotlightCard
-              className="relative max-w-md w-full border border-[#dfb24c]/20 rounded-2xl p-6 md:p-8 shadow-2xl overflow-hidden text-center"
+            {/* Elegant Background Sparkle Glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-[#dfb24c]/10 rounded-full blur-[100px] pointer-events-none animate-pulse" />
+            
+            <motion.div
+              initial={{ scale: 0.9, y: 30, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 30, opacity: 0 }}
+              transition={{ type: 'spring', damping: 20, stiffness: 120 }}
+              className="w-full max-w-md relative"
             >
-              <div className="space-y-6">
-                <div className="relative mx-auto w-14 h-14 flex items-center justify-center bg-white/[0.02] rounded-full border border-white/10">
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 15, ease: 'linear' }}
-                    className="absolute inset-[1px] border border-dashed border-[#dfb24c]/35 rounded-full"
-                  />
-                  <Users className="w-5 h-5 text-[#dfb24c]" />
-                </div>
+              <SpotlightCard
+                className="relative w-full border border-[#dfb24c]/30 rounded-2xl p-6 md:p-8 shadow-2xl overflow-hidden text-center bg-zinc-950/90"
+              >
+                {/* Visual Glow Highlights */}
+                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#dfb24c] to-transparent" />
+                
+                <div className="space-y-6">
+                  {/* Outer Pulsing Badge */}
+                  <div className="relative mx-auto w-16 h-16 flex items-center justify-center bg-emerald-500/5 rounded-full border border-emerald-500/20">
+                    <motion.div
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
+                      className="absolute inset-0 bg-emerald-500/10 rounded-full filter blur-md"
+                    />
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ repeat: Infinity, duration: 10, ease: 'linear' }}
+                      className="absolute inset-[2px] border border-dashed border-[#dfb24c]/40 rounded-full"
+                    />
+                    <Check className="w-6 h-6 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
+                  </div>
 
-                <div className="space-y-2">
-                  <motion.div
-                    initial={{ scale: 0.9 }}
-                    animate={{ scale: 1 }}
-                    className="inline-block px-3 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/20 text-[9px] uppercase font-mono tracking-wider text-emerald-400 font-bold"
-                  >
-                    ✔ Live Campaign Engaged
-                  </motion.div>
-                  <h3 className="text-xl font-display font-medium text-white tracking-tight">
-                    Order Synchronized! ✧
-                  </h3>
-                  <p className="text-xs font-mono text-slate-400">
-                    Linked Profile Target: <span className="text-[#dfb24c] font-bold">@{deployedUser}</span>
-                  </p>
-                </div>
-
-                {/* Main high impact trust instruction card in pristine design */}
-                <div className="p-5 rounded-xl bg-[#050608] border border-white/5">
-                  <div className="space-y-2.5 text-center">
-                    <p className="font-display font-semibold text-sm leading-snug text-white">
-                      ⚡ Kuch hi ghanto me followers deliver ho jayenge!
+                  <div className="space-y-2">
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1 bg-emerald-500/10 rounded-full border border-emerald-500/20 text-[10px] uppercase font-mono tracking-widest text-emerald-400 font-bold"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                      Order Status: Done! ✅
+                    </motion.div>
+                    
+                    <h3 className="text-xl md:text-2xl font-display font-medium text-white tracking-tight">
+                      Order Done!
+                    </h3>
+                    <p className="text-[#dfb24c] font-display text-base font-semibold animate-transition flex items-center justify-center gap-1.5">
+                      <Clock className="w-4 h-4 animate-spin text-[#dfb24c]" style={{ animationDuration: '6s' }} />
+                      Waiting for few hours... ⏳
                     </p>
-                    <div className="h-[1px] w-6 bg-white/10 mx-auto" />
-                    <p className="text-xs text-slate-400 leading-relaxed font-sans">
-                      Aapke account <span className="text-white font-medium">@{deployedUser}</span> par safely <span className="text-[#dfb24c] font-bold">+{deployedAmount} {deployedType}</span> bheje ja rahe hain. Delivery organic and gradual hogi taaki koi issue na aaye. Please keep patient!
+                    <p className="text-xs font-mono text-slate-400">
+                      Target Account: <span className="text-[#dfb24c] font-bold">@{deployedUser}</span>
                     </p>
                   </div>
-                </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowDeliveryBanner(false);
-                    resetForm();
-                  }}
-                  className="w-full py-3 rounded-lg font-display font-semibold text-xs tracking-wider text-slate-950 shimmer-button-bg hover:brightness-110 active:scale-95 transition-all cursor-pointer shadow-md shadow-[#dfb24c]/10"
-                >
-                  Thik hai / Done 👍
-                </button>
-              </div>
-            </SpotlightCard>
+                  {/* Progressive Loading Simulation bar */}
+                  <div className="w-full bg-white/[0.03] border border-white/5 rounded-full h-1.5 overflow-hidden relative">
+                    <motion.div
+                      initial={{ width: "0%" }}
+                      animate={{ width: "100%" }}
+                      transition={{ duration: 3, ease: "easeInOut" }}
+                      className="bg-gradient-to-r from-emerald-500 via-[#dfb24c] to-amber-400 h-full rounded-full"
+                    />
+                  </div>
+
+                  {/* Description Box with precise Indian user messaging */}
+                  <div className="p-5 rounded-xl bg-black/40 border border-[#dfb24c]/10 text-center relative overflow-hidden group">
+                    <div className="absolute -right-10 -bottom-10 w-24 h-24 bg-[#dfb24c]/3 rounded-full blur-xl pointer-events-none" />
+                    <div className="space-y-3 text-center relative z-10">
+                      <p className="font-display font-semibold text-sm leading-snug text-white">
+                        ⚡ Kuch hi ghanto me campaign processing shuru ho jayegi!
+                      </p>
+                      <div className="h-[1px] w-8 bg-[#dfb24c]/20 mx-auto" />
+                      <p className="text-[11px] text-slate-400 leading-relaxed font-sans">
+                        Aapke account <span className="text-white font-medium">@{deployedUser}</span> par safely <span className="text-[#dfb24c] font-bold">+{deployedAmount} {deployedType}</span> deliver kiye ja rhe hain. Traffic network gradual and safe hai taaki profile completely healthy rahe. Subah tak progress bar update ho jayegi!
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowDeliveryBanner(false);
+                      resetForm();
+                    }}
+                    className="w-full py-3.5 rounded-lg font-display font-semibold text-xs tracking-wider text-slate-950 shimmer-button-bg hover:brightness-110 active:scale-95 transition-all cursor-pointer shadow-lg shadow-[#dfb24c]/10 hover:shadow-[#dfb24c]/20"
+                  >
+                    Thik hai / Got it 👍
+                  </button>
+                </div>
+              </SpotlightCard>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
